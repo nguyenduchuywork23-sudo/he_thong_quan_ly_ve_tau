@@ -11,6 +11,7 @@ namespace VetauBackend.Services
     public interface IBookingService
     {
         Task<Booking?> CreateBookingAsync(CreateBookingRequest req, string sessionId, int? userId);
+        Task<List<Booking>> GetMyBookingsAsync(int userId);
     }
 
     public class BookingService : IBookingService
@@ -88,6 +89,14 @@ namespace VetauBackend.Services
 
             await _context.SaveChangesAsync();
             return booking;
+        }
+
+        public async Task<List<Booking>> GetMyBookingsAsync(int userId)
+        {
+            return await _context.Bookings
+                .Where(b => b.UserId == userId)
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
         }
     }
 }
