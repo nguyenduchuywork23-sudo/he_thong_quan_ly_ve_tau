@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VetauBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+41b259eeacb61a97f5a888edfccd3540feb947fe")]
 [assembly: System.Reflection.AssemblyProductAttribute("VetauBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VetauBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
