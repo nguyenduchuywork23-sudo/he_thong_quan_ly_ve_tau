@@ -21,6 +21,9 @@ class ApiConstants {
   /// POST /api/auth/login
   static const String login = '/api/auth/login';
 
+  /// POST /api/auth/register
+  static const String register = '/api/auth/register';
+
   /// GET /api/trips/search?FromStation=&ToStation=&Date=
   static const String tripsSearch = '/api/trips/search';
 
@@ -32,6 +35,9 @@ class ApiConstants {
 
   /// POST /api/bookings  (Header: X-Session-Id)
   static const String createBooking = '/api/bookings';
+
+  /// GET /api/bookings/my-bookings
+  static const String myBookings = '/api/bookings/my-bookings';
 
   // ─── Admin Endpoints (JWT: role = admin | staff) ───
 

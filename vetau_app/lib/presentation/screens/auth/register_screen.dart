@@ -1,4 +1,4 @@
-/// LoginScreen – Đăng nhập & phân quyền
+/// RegisterScreen – Đăng ký tài khoản mới
 library;
 
 import 'package:flutter/material.dart';
@@ -8,22 +8,36 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../presentation/providers/auth_provider.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _fullNameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  final _confirmPassCtrl = TextEditingController();
+  
+  final _emailFocus = FocusNode();
   final _passFocus = FocusNode();
-  bool _obscure = true;
+  final _confirmPassFocus = FocusNode();
+  
+  bool _obscurePass = true;
+  bool _obscureConfirmPass = true;
   bool _touched = false;
+
+  String? get _fullNameErr {
+    if (!_touched) return null;
+    if (_fullNameCtrl.text.trim().isEmpty) return 'Vui lòng nhập họ và tên';
+    return null;
+  }
 
   String? get _emailErr {
     if (!_touched) return null;
     if (_emailCtrl.text.trim().isEmpty) return 'Vui lòng nhập email';
+    if (!_emailCtrl.text.contains('@')) return 'Email không hợp lệ';
     return null;
   }
 
@@ -34,33 +48,53 @@ class _LoginScreenState extends State<LoginScreen> {
     return null;
   }
 
+  String? get _confirmPassErr {
+    if (!_touched) return null;
+    if (_confirmPassCtrl.text.isEmpty) return 'Vui lòng xác nhận mật khẩu';
+    if (_confirmPassCtrl.text != _passCtrl.text) return 'Mật khẩu không khớp';
+    return null;
+  }
+
   @override
   void dispose() {
+    _fullNameCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
+    _confirmPassCtrl.dispose();
+    
+    _emailFocus.dispose();
     _passFocus.dispose();
+    _confirmPassFocus.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     setState(() => _touched = true);
-    if (_emailErr != null || _passErr != null) return;
+    if (_fullNameErr != null || _emailErr != null || _passErr != null || _confirmPassErr != null) return;
 
     FocusScope.of(context).unfocus();
     final auth = context.read<AuthProvider>();
-    final ok = await auth.login(_emailCtrl.text.trim(), _passCtrl.text);
+    final ok = await auth.register(
+      _emailCtrl.text.trim(), 
+      _passCtrl.text,
+      _fullNameCtrl.text.trim(),
+    );
 
     if (!mounted) return;
     if (ok) {
-      final role = auth.user?.role ?? 'customer';
-      if (role == 'admin' || role == 'staff') {
-        context.go('/admin');
-      } else {
-        context.canPop() ? context.pop() : context.go('/');
-      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text('Đăng ký thành công!'),
+        backgroundColor: AppTheme.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(12),
+      ));
+      
+      // Navigate to home after successful registration
+      context.canPop() ? context.pop() : context.go('/');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(auth.error ?? 'Email hoặc mật khẩu không đúng'),
+        content: Text(auth.error ?? 'Đăng ký thất bại. Vui lòng thử lại.'),
         backgroundColor: AppTheme.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -89,48 +123,49 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const SizedBox(height: 12),
                   IconButton(
-                    onPressed: () =>
-                        context.canPop() ? context.pop() : context.go('/'),
+                    onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_ios,
                         color: AppTheme.textSecondary, size: 20),
                     padding: EdgeInsets.zero,
                   ),
                   const SizedBox(height: 28),
 
-                  // Logo
-                  Row(children: [
-                    Container(width: 46, height: 46,
-                      decoration: BoxDecoration(color: AppTheme.primary,
-                          borderRadius: BorderRadius.circular(13)),
-                      child: const Icon(Icons.train, color: Colors.white, size: 24)),
-                    const SizedBox(width: 10),
-                    RichText(text: const TextSpan(children: [
-                      TextSpan(text: 'Vé', style: TextStyle(fontSize: 24,
-                          fontWeight: FontWeight.w900, color: AppTheme.primary)),
-                      TextSpan(text: 'Tàu', style: TextStyle(fontSize: 24,
-                          fontWeight: FontWeight.w900, color: AppTheme.textPrimary)),
-                    ])),
-                  ]),
-
-                  const SizedBox(height: 32),
-                  const Text('Đăng nhập', style: TextStyle(fontSize: 28,
+                  const Text('Tạo tài khoản', style: TextStyle(fontSize: 28,
                       fontWeight: FontWeight.w800, color: AppTheme.textPrimary)),
                   const SizedBox(height: 6),
-                  const Text('Chào mừng bạn trở lại!',
+                  const Text('Tham gia cùng chúng tôi ngay hôm nay!',
                       style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
                   const SizedBox(height: 32),
+
+                  // Full Name
+                  const _Label('Họ và tên'),
+                  const SizedBox(height: 6),
+                  TextFormField(
+                    controller: _fullNameCtrl,
+                    textInputAction: TextInputAction.next,
+                    style: const TextStyle(color: AppTheme.textPrimary),
+                    onChanged: (_) => setState(() {}),
+                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
+                    decoration: InputDecoration(
+                      hintText: 'Nguyễn Văn A',
+                      prefixIcon: const Icon(Icons.person_outline,
+                          color: AppTheme.textHint, size: 20),
+                      errorText: _fullNameErr,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
 
                   // Email
                   const _Label('Email'),
                   const SizedBox(height: 6),
                   TextFormField(
                     controller: _emailCtrl,
+                    focusNode: _emailFocus,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     style: const TextStyle(color: AppTheme.textPrimary),
                     onChanged: (_) => setState(() {}),
-                    onFieldSubmitted: (_) =>
-                        FocusScope.of(context).requestFocus(_passFocus),
+                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_passFocus),
                     decoration: InputDecoration(
                       hintText: 'example@email.com',
                       prefixIcon: const Icon(Icons.email_outlined,
@@ -146,7 +181,33 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextFormField(
                     controller: _passCtrl,
                     focusNode: _passFocus,
-                    obscureText: _obscure,
+                    obscureText: _obscurePass,
+                    textInputAction: TextInputAction.next,
+                    style: const TextStyle(color: AppTheme.textPrimary),
+                    onChanged: (_) => setState(() {}),
+                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmPassFocus),
+                    decoration: InputDecoration(
+                      hintText: '••••••••',
+                      prefixIcon: const Icon(Icons.lock_outline,
+                          color: AppTheme.textHint, size: 20),
+                      errorText: _passErr,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePass ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                          color: AppTheme.textHint, size: 20),
+                        onPressed: () => setState(() => _obscurePass = !_obscurePass),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Confirm Password
+                  const _Label('Xác nhận mật khẩu'),
+                  const SizedBox(height: 6),
+                  TextFormField(
+                    controller: _confirmPassCtrl,
+                    focusNode: _confirmPassFocus,
+                    obscureText: _obscureConfirmPass,
                     textInputAction: TextInputAction.done,
                     style: const TextStyle(color: AppTheme.textPrimary),
                     onChanged: (_) => setState(() {}),
@@ -155,13 +216,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintText: '••••••••',
                       prefixIcon: const Icon(Icons.lock_outline,
                           color: AppTheme.textHint, size: 20),
-                      errorText: _passErr,
+                      errorText: _confirmPassErr,
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscure ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
+                          _obscureConfirmPass ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                           color: AppTheme.textHint, size: 20),
-                        onPressed: () => setState(() => _obscure = !_obscure),
+                        onPressed: () => setState(() => _obscureConfirmPass = !_obscureConfirmPass),
                       ),
                     ),
                   ),
@@ -189,51 +249,25 @@ class _LoginScreenState extends State<LoginScreen> {
                           : const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.login, size: 20),
+                                Icon(Icons.person_add, size: 20),
                                 SizedBox(width: 8),
-                                Text('Đăng nhập', style: TextStyle(
+                                Text('Đăng ký', style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w700)),
                               ]),
                     ),
                   ),
+                  
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Chưa có tài khoản?', style: TextStyle(color: AppTheme.textSecondary)),
+                      const Text('Đã có tài khoản?', style: TextStyle(color: AppTheme.textSecondary)),
                       TextButton(
-                        onPressed: () => context.push('/register'),
-                        child: const Text('Đăng ký ngay', style: TextStyle(
+                        onPressed: () => context.pop(),
+                        child: const Text('Đăng nhập ngay', style: TextStyle(
                             color: AppTheme.primary, fontWeight: FontWeight.w700)),
                       )
                     ],
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Demo accounts info
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppTheme.info.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppTheme.info.withOpacity(0.25)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(children: [
-                          Icon(Icons.info_outline, color: AppTheme.info, size: 15),
-                          SizedBox(width: 6),
-                          Text('Tài khoản thử nghiệm', style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w700,
-                              color: AppTheme.info)),
-                        ]),
-                        const SizedBox(height: 8),
-                        _DemoRow('Khách hàng:', 'customer@vetau.vn / 123456'),
-                        _DemoRow('Admin:', 'admin@vetau.vn / admin123'),
-                        _DemoRow('Nhân viên:', 'staff@vetau.vn / staff123'),
-                      ],
-                    ),
                   ),
                   const SizedBox(height: 40),
                 ],
@@ -253,20 +287,4 @@ class _Label extends StatelessWidget {
   Widget build(BuildContext context) => Text(text,
       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600,
           color: AppTheme.textSecondary));
-}
-
-class _DemoRow extends StatelessWidget {
-  final String label, value;
-  const _DemoRow(this.label, this.value);
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 4),
-    child: Row(children: [
-      SizedBox(width: 76, child: Text(label,
-          style: const TextStyle(fontSize: 11, color: AppTheme.textHint))),
-      Expanded(child: Text(value, style: const TextStyle(
-          fontSize: 11, color: AppTheme.textSecondary,
-          fontWeight: FontWeight.w600))),
-    ]),
-  );
 }

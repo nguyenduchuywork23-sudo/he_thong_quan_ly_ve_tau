@@ -135,6 +135,47 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // ─── Đăng ký ────────────────────────────────
+  Future<bool> register(String email, String password, String fullName) async {
+    _state = AuthState.loading;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final data = await _authService.register(
+        email: email,
+        password: password,
+        fullName: fullName,
+      );
+
+      final token = data['Token'] as String? ?? data['token'] as String? ?? '';
+      final userMap = data['User'] as Map<String, dynamic>? ??
+          data['user'] as Map<String, dynamic>? ??
+          {};
+
+      _user = UserModel.fromJson(userMap);
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(ApiConstants.keyJwtToken, token);
+      await prefs.setString(ApiConstants.keyUserJson, jsonEncode(_user!.toJson()));
+      await prefs.setString(ApiConstants.keyUserRole, _user!.role);
+
+      _state = AuthState.authenticated;
+      notifyListeners();
+      return true;
+    } on AppException catch (e) {
+      _error = e.message;
+      _state = AuthState.error;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _error = 'Lỗi không xác định khi đăng ký.';
+      _state = AuthState.error;
+      notifyListeners();
+      return false;
+    }
+  }
+
   // ─── Đăng xuất ────────────────────────────────
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();

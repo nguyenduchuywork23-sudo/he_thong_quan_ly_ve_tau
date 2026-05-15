@@ -61,6 +61,7 @@ class BookingProvider extends ChangeNotifier {
 
   // ─── Saved Bookings (My Tickets) ─────────────
   List<Map<String, dynamic>> _savedBookings = [];
+  bool _isFetchingBookings = false;
 
   // ─── Getters ──────────────────────────────────
   TripSearchResult? get trip => _trip;
@@ -83,6 +84,9 @@ class BookingProvider extends ChangeNotifier {
   bool get isSubmitting => _submitState == BookingSubmitState.submitting;
   bool get isSuccess => _submitState == BookingSubmitState.success;
 
+  bool get isSuccess => _submitState == BookingSubmitState.success;
+
+  bool get isFetchingBookings => _isFetchingBookings;
   List<Map<String, dynamic>> get savedBookings =>
       List.unmodifiable(_savedBookings);
 
@@ -276,8 +280,7 @@ class BookingProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════
-  // MY TICKETS – Lưu & tải vé từ SharedPreferences
-  // (BE chưa có endpoint GET /my-bookings)
+  // MY TICKETS – Lưu local & Tải vé từ Server
   // ═══════════════════════════════════════════════
 
   /// Lưu booking result vào SharedPreferences
@@ -315,9 +318,47 @@ class BookingProvider extends ChangeNotifier {
     if (_savedBookings.length > 20) _savedBookings = _savedBookings.sublist(0, 20);
   }
 
-  /// Tải danh sách vé đã lưu từ SharedPreferences
+  /// Tải danh sách vé từ Server (nếu đã đăng nhập) hoặc SharedPreferences
   Future<void> loadSavedBookings() async {
+    _isFetchingBookings = true;
+    notifyListeners();
+
     final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(ApiConstants.keyJwtToken);
+
+    if (token != null && token.isNotEmpty) {
+      // Đã đăng nhập -> Lấy từ BE
+      try {
+        final apiBookings = await _bookingService.getMyBookings();
+        // Cập nhật list với data từ server (Mapping properties from BE Model to our local map format if needed)
+        // BE trả về properties viết hoa: BookingCode, TrainName, DepartureDate...
+        _savedBookings = apiBookings.map((b) {
+          return {
+            'bookingCode': b['bookingCode'] ?? b['BookingCode'] ?? '',
+            'finalPrice': b['finalPrice'] ?? b['FinalPrice'] ?? 0,
+            'qrCodeData': b['qrCodeData'] ?? b['QrCodeData'],
+            'trainName': b['trainName'] ?? b['TrainName'] ?? '',
+            'fromStation': b['fromStation'] ?? b['FromStation'] ?? '',
+            'toStation': b['toStation'] ?? b['ToStation'] ?? '',
+            'departureDate': b['departureDate'] ?? b['DepartureDate'] ?? '',
+            'departureTime': b['departureTime'] ?? b['DepartureTime'] ?? '',
+            'arrivalTime': b['arrivalTime'] ?? b['ArrivalTime'] ?? '',
+            'seatNumber': b['seatNumber'] ?? b['SeatNumber'] ?? '',
+            'passengerName': b['passengerName'] ?? b['PassengerName'] ?? '',
+            'savedAt': b['createdAt'] ?? b['CreatedAt'] ?? '',
+          };
+        }).toList();
+        
+        _isFetchingBookings = false;
+        notifyListeners();
+        return;
+      } catch (e) {
+        // Fallback to local if API fails
+        debugPrint('Lấy vé từ server thất bại, dùng local fallback: $e');
+      }
+    }
+
+    // Chưa đăng nhập hoặc lỗi API -> Load từ local storage
     final list = prefs.getStringList(ApiConstants.keyMyBookings) ?? [];
     _savedBookings = list.map((s) {
       try {
@@ -326,6 +367,8 @@ class BookingProvider extends ChangeNotifier {
         return <String, dynamic>{};
       }
     }).where((m) => m.isNotEmpty).toList();
+    
+    _isFetchingBookings = false;
     notifyListeners();
   }
 

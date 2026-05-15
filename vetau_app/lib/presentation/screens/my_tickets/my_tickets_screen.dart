@@ -56,18 +56,34 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
       ),
       body: Consumer<BookingProvider>(
         builder: (ctx, bp, _) {
+          if (bp.isFetchingBookings && bp.savedBookings.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
           final tickets = bp.savedBookings;
 
           if (tickets.isEmpty) {
-            return _EmptyState();
+            return RefreshIndicator(
+              onRefresh: () => context.read<BookingProvider>().loadSavedBookings(),
+              child: Stack(
+                children: [
+                  ListView(), // Cần ListView để Pull-to-refresh hoạt động
+                  _EmptyState(),
+                ],
+              ),
+            );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: tickets.length,
-            itemBuilder: (ctx, i) => _TicketCard(
-              booking: tickets[i],
-              onTap: () => _showQrSheet(context, tickets[i]),
+          return RefreshIndicator(
+            onRefresh: () => context.read<BookingProvider>().loadSavedBookings(),
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              itemCount: tickets.length,
+              itemBuilder: (ctx, i) => _TicketCard(
+                booking: tickets[i],
+                onTap: () => _showQrSheet(context, tickets[i]),
+              ),
             ),
           );
         },

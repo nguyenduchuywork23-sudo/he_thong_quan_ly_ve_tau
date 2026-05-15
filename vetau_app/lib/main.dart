@@ -23,6 +23,7 @@ import 'presentation/screens/seat_selection/seat_selection_screen.dart';
 import 'presentation/screens/booking/passenger_form_screen.dart';
 import 'presentation/screens/booking/booking_confirm_screen.dart';
 import 'presentation/screens/auth/login_screen.dart';
+import 'presentation/screens/auth/register_screen.dart';
 import 'presentation/screens/my_tickets/my_tickets_screen.dart';
 import 'presentation/screens/admin/admin_layout.dart';
 import 'presentation/providers/admin_provider.dart';
@@ -104,6 +105,13 @@ final GoRouter _router = GoRouter(
       path: '/login',
       name: 'login',
       builder: (context, state) => const LoginScreen(),
+    ),
+
+    // Đăng ký
+    GoRoute(
+      path: '/register',
+      name: 'register',
+      builder: (context, state) => const RegisterScreen(),
     ),
 
     // Vé của tôi

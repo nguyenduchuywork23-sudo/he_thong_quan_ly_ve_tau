@@ -18,6 +18,7 @@ namespace VetauBackend.Services
     public interface IAuthService
     {
         Task<AuthResponse?> LoginAsync(LoginRequest request);
+        Task<AuthResponse?> RegisterAsync(RegisterRequest request);
     }
 
     public class AuthService : IAuthService
@@ -37,6 +38,31 @@ namespace VetauBackend.Services
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return null;
 
+            return GenerateAuthResponse(user);
+        }
+
+        public async Task<AuthResponse?> RegisterAsync(RegisterRequest request)
+        {
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+                throw new Exception("Email đã được sử dụng.");
+
+            var user = new User
+            {
+                Email = request.Email,
+                FullName = request.FullName,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Role = "customer",
+                IsActive = true
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return GenerateAuthResponse(user);
+        }
+
+        private AuthResponse GenerateAuthResponse(User user)
+        {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_config["JwtSettings:Secret"] ?? "2f913d7e6c4a8b5024a19c5b8e97f06d");
             var expiresDays = _config.GetValue<int>("JwtSettings:ExpiryDays", 7);

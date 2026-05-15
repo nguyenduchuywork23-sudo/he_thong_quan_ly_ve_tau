@@ -54,4 +54,27 @@ class BookingService {
       throw AppException(message: 'Lỗi không xác định khi đặt vé: $e');
     }
   }
+
+  // ─────────────────────────────────────────────────────────────────
+  // GET /api/bookings/my-bookings
+  // Lấy danh sách lịch sử vé của người dùng đã đăng nhập.
+  // Trả về List<Booking> (chuyển thành Map để xử lý)
+  // ─────────────────────────────────────────────────────────────────
+  Future<List<Map<String, dynamic>>> getMyBookings() async {
+    try {
+      final response = await _dio.get(ApiConstants.myBookings);
+      final List<dynamic> data = response.data as List<dynamic>;
+      return data.map((e) => e as Map<String, dynamic>).toList();
+    } on DioException catch (e) {
+      final appEx = e.error;
+      if (appEx is AppException) throw appEx;
+      throw AppException(
+        message: 'Lỗi tải danh sách vé. Vui lòng thử lại.',
+        statusCode: e.response?.statusCode,
+      );
+    } catch (e) {
+      if (e is AppException) rethrow;
+      throw AppException(message: 'Lỗi không xác định khi tải lịch sử vé.');
+    }
+  }
 }

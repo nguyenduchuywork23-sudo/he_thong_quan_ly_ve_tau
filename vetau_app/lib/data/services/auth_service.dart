@@ -32,4 +32,33 @@ class AuthService {
       throw AppException(message: 'Lỗi không xác định khi đăng nhập.');
     }
   }
+  /// POST /api/auth/register
+  /// Trả về Map { "Token": "...", "User": { ... } }
+  Future<Map<String, dynamic>> register({
+    required String email,
+    required String password,
+    required String fullName,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.register,
+        data: {
+          'Email': email,
+          'Password': password,
+          'FullName': fullName,
+        },
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final appEx = e.error;
+      if (appEx is AppException) throw appEx;
+      throw AppException(
+        message: e.response?.data?['Message'] ?? e.message ?? 'Đăng ký thất bại.',
+        statusCode: e.response?.statusCode,
+      );
+    } catch (e) {
+      if (e is AppException) rethrow;
+      throw AppException(message: 'Lỗi không xác định khi đăng ký.');
+    }
+  }
 }

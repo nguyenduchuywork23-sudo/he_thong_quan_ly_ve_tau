@@ -26,6 +26,20 @@ namespace VetauBackend.Controllers
             if (res == null) return Unauthorized(new { Message = "Email hoặc mật khẩu không đúng." });
             return Ok(res);
         }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest req)
+        {
+            try
+            {
+                var res = await _authService.RegisterAsync(req);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
     }
 
     [ApiController]
@@ -119,6 +133,21 @@ namespace VetauBackend.Controllers
             {
                 return BadRequest(new { Message = ex.Message });
             }
+        }
+
+        /// <summary>
+        /// Khách hàng đã đăng nhập xem lịch sử vé của mình.
+        /// </summary>
+        [HttpGet("my-bookings")]
+        [Authorize(Roles = "customer,admin,staff")]
+        public async Task<IActionResult> GetMyBookings()
+        {
+            var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(idStr, out int userId))
+                return Unauthorized(new { Message = "Không xác định được tài khoản." });
+
+            var bookings = await _bookingService.GetMyBookingsAsync(userId);
+            return Ok(bookings);
         }
     }
 
