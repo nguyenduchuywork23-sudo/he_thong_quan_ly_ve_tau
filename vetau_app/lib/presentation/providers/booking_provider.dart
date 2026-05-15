@@ -14,7 +14,7 @@ import '../../data/models/booking_model.dart';
 import '../../data/models/trip_model.dart';
 import '../../data/models/train_model.dart';
 import '../../data/services/booking_service.dart';
-import '../../core/network/dio_client.dart';
+import '../../core/network/dio_client.dart' hide debugPrint;
 import '../../core/constants/api_constants.dart';
 
 // ═══════════════════════════════════════════════
@@ -82,8 +82,6 @@ class BookingProvider extends ChangeNotifier {
   String? get submitError => _submitError;
   CreateBookingResponse? get bookingResult => _bookingResult;
   bool get isSubmitting => _submitState == BookingSubmitState.submitting;
-  bool get isSuccess => _submitState == BookingSubmitState.success;
-
   bool get isSuccess => _submitState == BookingSubmitState.success;
 
   bool get isFetchingBookings => _isFetchingBookings;

@@ -12,55 +12,55 @@ class ApiConstants {
   // iOS Simulator   : 127.0.0.1
   // Thiết bị thật   : IP LAN của máy chạy BE (vd: 192.168.1.100)
   // ─────────────────────────────────────────────
-  static const String baseUrl = 'http://10.0.2.2:5000';
+  static const String baseUrl = 'http://10.0.2.2:5065';
 
   // ─────────────────────────────────────────────
   // ENDPOINTS – ánh xạ từ Controllers/AppControllers.cs
   // ─────────────────────────────────────────────
 
-  /// POST /api/auth/login
-  static const String login = '/api/auth/login';
+  /// POST /api/Auth/login
+  static const String login = '/api/Auth/login';
 
-  /// POST /api/auth/register
-  static const String register = '/api/auth/register';
+  /// POST /api/Auth/register
+  static const String register = '/api/Auth/register';
 
-  /// GET /api/trips/search?FromStation=&ToStation=&Date=
-  static const String tripsSearch = '/api/trips/search';
+  /// GET /api/Trips/search?FromStation=&ToStation=&Date=
+  static const String tripsSearch = '/api/Trips/search';
 
-  /// GET /api/trips/{id}/seats
-  static String tripSeats(int tripId) => '/api/trips/$tripId/seats';
+  /// GET /api/Trips/{id}/seats
+  static String tripSeats(int tripId) => '/api/Trips/$tripId/seats';
 
-  /// POST /api/trips/lock-seat  (Header: X-Session-Id)
-  static const String lockSeat = '/api/trips/lock-seat';
+  /// POST /api/Trips/lock-seat  (Header: X-Session-Id)
+  static const String lockSeat = '/api/Trips/lock-seat';
 
-  /// POST /api/bookings  (Header: X-Session-Id)
-  static const String createBooking = '/api/bookings';
+  /// POST /api/Bookings  (Header: X-Session-Id)
+  static const String createBooking = '/api/Bookings';
 
-  /// GET /api/bookings/my-bookings
-  static const String myBookings = '/api/bookings/my-bookings';
+  /// GET /api/Bookings/my-bookings
+  static const String myBookings = '/api/Bookings/my-bookings';
 
   // ─── Admin Endpoints (JWT: role = admin | staff) ───
 
-  /// GET /api/admin/dashboard
-  static const String adminDashboard = '/api/admin/dashboard';
+  /// GET /api/Admin/dashboard
+  static const String adminDashboard = '/api/Admin/dashboard';
 
-  /// GET | POST /api/admin/stations
-  static const String adminStations = '/api/admin/stations';
+  /// GET | POST /api/Admin/stations
+  static const String adminStations = '/api/Admin/stations';
 
-  /// PUT /api/admin/stations/{id}
-  static String adminStationById(int id) => '/api/admin/stations/$id';
+  /// PUT /api/Admin/stations/{id}
+  static String adminStationById(int id) => '/api/Admin/stations/$id';
 
-  /// DELETE /api/admin/stations/{id}
-  static String adminDeleteStation(int id) => '/api/admin/stations/$id';
+  /// DELETE /api/Admin/stations/{id}
+  static String adminDeleteStation(int id) => '/api/Admin/stations/$id';
 
-  /// GET /api/admin/trains
-  static const String adminTrains = '/api/admin/trains';
+  /// GET /api/Admin/trains
+  static const String adminTrains = '/api/Admin/trains';
 
-  /// GET /api/admin/bookings
-  static const String adminBookings = '/api/admin/bookings';
+  /// GET /api/Admin/bookings
+  static const String adminBookings = '/api/Admin/bookings';
 
-  /// PUT /api/admin/bookings/{id}/status
-  static String adminBookingStatus(int id) => '/api/admin/bookings/$id/status';
+  /// PUT /api/Admin/bookings/{id}/status
+  static String adminBookingStatus(int id) => '/api/Admin/bookings/$id/status';
 
   // ─────────────────────────────────────────────
   // TIMEOUTS
