@@ -37,8 +37,9 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
 
   Future<void> _load() async {
     final tp = context.read<TripProvider>();
-    if (tp.selectedTrip == null) return;
-    await tp.loadSeats(tp.selectedTrip!.id);
+    final trip = tp.selectedTrip;
+    if (trip == null) return;
+    await tp.loadSeats(trip.id);
     if (!mounted) return;
     _initTabs(context.read<TripProvider>().carriages.length);
   }
@@ -57,13 +58,23 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
 
   Future<void> _onContinue() async {
     final tp = context.read<TripProvider>();
-    if (tp.selectedSeat == null) return;
+    final seat = tp.selectedSeat;
+    final trip = tp.selectedTrip;
+    final carriage = tp.selectedCarriage;
+
+    if (seat == null || trip == null || carriage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Chưa có đủ thông tin đặt vé. Vui lòng thử lại.'),
+        backgroundColor: AppTheme.error,
+        behavior: SnackBarBehavior.floating,
+      ));
+      return;
+    }
 
     final success = await tp.lockSelectedSeat();
     if (!mounted) return;
 
     if (success) {
-      // Tìm station IDs từ danh sách đã load
       final stations = tp.stations;
       int fromId = 0, toId = 0;
       for (final s in stations) {
@@ -71,9 +82,9 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
         if (s.code == tp.lastToCode) toId = s.id;
       }
       context.read<BookingProvider>().setBookingContext(
-        trip: tp.selectedTrip!,
-        seat: tp.selectedSeat!,
-        carriage: tp.selectedCarriage!,
+        trip: trip,
+        seat: seat,
+        carriage: carriage,
         fromStationId: fromId,
         toStationId: toId,
       );
@@ -424,16 +435,22 @@ class _BottomPanel extends StatelessWidget {
         else ...[
           Row(children: [
             // Seat info
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Ghế ${tp.selectedSeat!.seatNumber}',
-                  style: const TextStyle(fontSize: 16,
-                      fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-              Text(tp.selectedCarriage?.displayName.replaceAll('\n', ' ') ?? '',
-                  style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
-            ]),
-            const Spacer(),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('Ghế ${tp.selectedSeat?.seatNumber ?? ""}',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 16,
+                        fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
+                Text(tp.selectedCarriage?.displayName.replaceAll('\n', ' ') ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+              ]),
+            ),
+            const SizedBox(width: 8),
             // Price
-            Text(price.format(tp.selectedSeat!.price),
+            Text(price.format(tp.selectedSeat?.price ?? 0),
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800,
                     color: AppTheme.primary)),
           ]),

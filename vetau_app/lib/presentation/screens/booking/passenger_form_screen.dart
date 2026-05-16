@@ -67,11 +67,21 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                 onPressed: () => context.pop(),
               ),
             ),
-            body: Form(
-              key: _formKey,
-              child: ListView(
-                padding: const EdgeInsets.all(AppTheme.spacingM),
-                children: [
+            resizeToAvoidBottomInset: true,
+            body: SafeArea(
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(
+                    left: AppTheme.spacingM,
+                    right: AppTheme.spacingM,
+                    top: AppTheme.spacingM,
+                    bottom: AppTheme.spacingM + MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                   // ── Tóm tắt chuyến ──────────────
                   _TripSummaryCard(bp: bp, tp: tp),
                   const SizedBox(height: AppTheme.spacingM),
@@ -181,8 +191,10 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
               ),
             ),
           ),
-          // Loading overlay
-          if (bp.isSubmitting)
+        ),
+      ),
+      // Loading overlay
+      if (bp.isSubmitting)
             Container(
               color: Colors.black54,
               child: const Center(

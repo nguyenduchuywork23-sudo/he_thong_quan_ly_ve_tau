@@ -148,41 +148,49 @@ class TripCard extends StatelessWidget {
                 // ── Row 3: Khoảng cách + Giá + Nút Chọn ──────
                 Row(
                   children: [
-                    // Distance
-                    _InfoChip(
-                      icon: Icons.straighten,
-                      label: '${trip.distance.toStringAsFixed(0)} km',
+                    // Distance & Route
+                    Expanded(
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          _InfoChip(
+                            icon: Icons.straighten,
+                            label: '${trip.distance.toStringAsFixed(0)} km',
+                          ),
+                          _InfoChip(
+                            icon: Icons.route,
+                            label: trip.routeName,
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(width: 8),
-                    // Route
-                    _InfoChip(
-                      icon: Icons.route,
-                      label: trip.routeName,
-                      maxWidth: 120,
-                    ),
-                    const Spacer(),
                     // Giá từ
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const Text('Từ',
-                            style: TextStyle(
-                                fontSize: 11, color: AppTheme.textHint)),
-                        Text(
-                          priceFormat.format(trip.basePrice),
-                          style: const TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w800,
-                            color: AppTheme.primary,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text('Từ',
+                              style: TextStyle(
+                                  fontSize: 11, color: AppTheme.textHint)),
+                          Text(
+                            priceFormat.format(trip.basePrice),
+                            style: const TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w800,
+                              color: AppTheme.primary,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     const SizedBox(width: 12),
                     // Nút chọn
                     ElevatedButton(
                       onPressed: onSelect,
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(80, 40),
+                        minimumSize: const Size(80, 36),
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                       ),
                       child: const Text('Chọn'),

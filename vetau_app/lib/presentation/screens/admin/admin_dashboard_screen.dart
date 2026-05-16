@@ -117,31 +117,34 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         // ── Infrastructure ────────────────────
         const _SectionHeader('Cơ sở hạ tầng'),
         const SizedBox(height: 10),
-        GridView.count(
-          crossAxisCount: 3,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 1.4,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _StatCard(
-              label: 'Ga tàu',
-              value: stats.totalStations.toString(),
-              icon: Icons.location_on_outlined,
-              color: const Color(0xFF8B5CF6),
+            Expanded(
+              child: _StatCard(
+                label: 'Ga tàu',
+                value: stats.totalStations.toString(),
+                icon: Icons.location_on_outlined,
+                color: const Color(0xFF8B5CF6),
+              ),
             ),
-            _StatCard(
-              label: 'Đoàn tàu',
-              value: stats.totalTrains.toString(),
-              icon: Icons.train_outlined,
-              color: const Color(0xFF06B6D4),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _StatCard(
+                label: 'Đoàn tàu',
+                value: stats.totalTrains.toString(),
+                icon: Icons.train_outlined,
+                color: const Color(0xFF06B6D4),
+              ),
             ),
-            _StatCard(
-              label: 'Chuyến chạy',
-              value: stats.activeTrips.toString(),
-              icon: Icons.route_outlined,
-              color: AppTheme.primary,
+            const SizedBox(width: 10),
+            Expanded(
+              child: _StatCard(
+                label: 'Chuyến chạy',
+                value: stats.activeTrips.toString(),
+                icon: Icons.route_outlined,
+                color: AppTheme.primary,
+              ),
             ),
           ],
         ),
@@ -244,11 +247,21 @@ class _StatCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Icon(icon, color: color, size: 22),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(value, style: TextStyle(
-                fontSize: 22, fontWeight: FontWeight.w900, color: color)),
-            Text(label, style: const TextStyle(
-                fontSize: 11, color: AppTheme.textSecondary)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start, 
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(value, style: TextStyle(
+                    fontSize: 22, fontWeight: FontWeight.w900, color: color)),
+              ),
+              Text(label, 
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 11, color: AppTheme.textSecondary)),
           ]),
         ],
       ),
