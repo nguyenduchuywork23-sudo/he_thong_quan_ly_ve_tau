@@ -272,7 +272,7 @@ class _QrCard extends StatelessWidget {
         const SizedBox(height: 16),
         _buildQr(),
         const SizedBox(height: 12),
-        const Text('Quét mã để thanh toán qua ngân hàng',
+        const Text('Quét mã để check-in hoặc thanh toán tại ga',
             style: TextStyle(fontSize: 12, color: Colors.black54),
             textAlign: TextAlign.center),
       ]),
@@ -280,33 +280,32 @@ class _QrCard extends StatelessWidget {
   }
 
   Widget _buildQr() {
-    // Nếu BE trả về base64 image
-    if (qrCodeData != null && qrCodeData!.contains('base64,')) {
-      try {
-        final b64 = qrCodeData!.split('base64,')[1];
-        final bytes = base64Decode(b64);
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.memory(bytes, width: 200, height: 200, fit: BoxFit.contain),
-        );
-      } catch (_) {
-        // fallback to qr_flutter
-      }
-    }
-
-    // Fallback: generate QR từ booking code bằng qr_flutter
-    return QrImageView(
-      data: qrCodeData?.isNotEmpty == true ? qrCodeData! : bookingCode,
-      version: QrVersions.auto,
-      size: 200,
-      backgroundColor: Colors.white,
-      eyeStyle: const QrEyeStyle(
-        eyeShape: QrEyeShape.square,
-        color: Colors.black,
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      dataModuleStyle: const QrDataModuleStyle(
-        dataModuleShape: QrDataModuleShape.square,
-        color: Colors.black,
+      child: QrImageView(
+        data: 'VETAU|$bookingCode',
+        version: QrVersions.auto,
+        size: 220.0,
+        backgroundColor: Colors.white,
+        eyeStyle: const QrEyeStyle(
+          eyeShape: QrEyeShape.square,
+          color: Colors.black,
+        ),
+        dataModuleStyle: const QrDataModuleStyle(
+          dataModuleShape: QrDataModuleShape.square,
+          color: Colors.black,
+        ),
       ),
     );
   }

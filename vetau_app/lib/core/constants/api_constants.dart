@@ -33,6 +33,9 @@ class ApiConstants {
   /// POST /api/Trips/lock-seat  (Header: X-Session-Id)
   static const String lockSeat = '/api/Trips/lock-seat';
 
+  /// GET /api/Trips/stations  (Public – dùng cho StationPicker)
+  static const String tripsStations = '/api/Trips/stations';
+
   /// POST /api/Bookings  (Header: X-Session-Id)
   static const String createBooking = '/api/Bookings';
 
@@ -61,6 +64,26 @@ class ApiConstants {
 
   /// PUT /api/Admin/bookings/{id}/status
   static String adminBookingStatus(int id) => '/api/Admin/bookings/$id/status';
+
+  // ─── Staff Endpoints (JWT: role = admin | staff) ───
+
+  /// GET /api/Staff/dashboard
+  static const String staffDashboard = '/api/Staff/dashboard';
+
+  /// GET /api/Staff/pending-bookings
+  static const String staffPendingBookings = '/api/Staff/pending-bookings';
+
+  /// PUT /api/Staff/bookings/{id}/approve
+  static String staffApproveBooking(int id) => '/api/Staff/bookings/$id/approve';
+
+  /// PUT /api/Staff/bookings/{id}/reject
+  static String staffRejectBooking(int id) => '/api/Staff/bookings/$id/reject';
+
+  /// GET /api/Staff/passenger-stats
+  static const String staffPassengerStats = '/api/Staff/passenger-stats';
+
+  /// GET /api/Staff/active-trips
+  static const String staffActiveTrips = '/api/Staff/active-trips';
 
   // ─────────────────────────────────────────────
   // TIMEOUTS

@@ -53,8 +53,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
     if (ok) {
       final role = auth.user?.role ?? 'customer';
-      if (role == 'admin' || role == 'staff') {
+      if (role == 'admin') {
         context.go('/admin');
+      } else if (role == 'staff') {
+        context.go('/staff');
       } else {
         context.canPop() ? context.pop() : context.go('/');
       }

@@ -157,6 +157,7 @@ class AdminService {
       if (data is! List) return [];
       return data.cast<Map<String, dynamic>>();
     } on DioException catch (e) {
+      print('Lỗi API: ${e.response?.statusCode} - ${e.response?.data}');
       final appEx = e.error;
       if (appEx is AppException) throw appEx;
       throw AppException(

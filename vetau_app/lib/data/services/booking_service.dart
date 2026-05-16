@@ -23,11 +23,16 @@ class BookingService {
   // ─────────────────────────────────────────────────────────────────
   Future<CreateBookingResponse> createBooking(
     CreateBookingRequest request,
+    String sessionId,
   ) async {
     try {
+      final requestData = request.toJson();
+      requestData['sessionId'] = sessionId;
+
       final response = await _dio.post(
         ApiConstants.createBooking,
-        data: request.toJson(),
+        data: requestData,
+        options: Options(headers: {'X-Session-Id': sessionId}),
       );
 
       return CreateBookingResponse.fromJson(

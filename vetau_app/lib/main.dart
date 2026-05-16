@@ -27,6 +27,8 @@ import 'presentation/screens/auth/register_screen.dart';
 import 'presentation/screens/my_tickets/my_tickets_screen.dart';
 import 'presentation/screens/admin/admin_layout.dart';
 import 'presentation/providers/admin_provider.dart';
+import 'presentation/providers/staff_provider.dart';
+import 'presentation/screens/admin/staff_layout.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +53,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => TripProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
         ChangeNotifierProvider(create: (_) => AdminProvider()),
+        ChangeNotifierProvider(create: (_) => StaffProvider()),
       ],
       child: const VetauApp(),
     ),
@@ -121,11 +124,18 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const MyTicketsScreen(),
     ),
 
-    // Admin Panel
+    // Admin Panel (chỉ role = admin)
     GoRoute(
       path: '/admin',
       name: 'admin',
       builder: (context, state) => const AdminLayout(),
+    ),
+
+    // Staff Panel (role = staff)
+    GoRoute(
+      path: '/staff',
+      name: 'staff',
+      builder: (context, state) => const StaffLayout(),
     ),
   ],
 );

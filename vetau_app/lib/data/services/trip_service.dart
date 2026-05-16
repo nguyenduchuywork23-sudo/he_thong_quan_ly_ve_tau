@@ -113,12 +113,12 @@ class TripService {
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // GET /api/admin/stations  (dùng cho StationPicker)
-  // Trả về List<StationModel>
+  // GET /api/Trips/stations  (Public – dùng cho StationPicker)
+  // Không yêu cầu đăng nhập; trả về List<StationModel>
   // ─────────────────────────────────────────────────────────────────
   Future<List<StationModel>> getStations() async {
     try {
-      final response = await _dio.get(ApiConstants.adminStations);
+      final response = await _dio.get(ApiConstants.tripsStations);
       final data = response.data;
       if (data is! List) return [];
 

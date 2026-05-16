@@ -87,6 +87,7 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
         carriage: carriage,
         fromStationId: fromId,
         toStationId: toId,
+        sessionId: tp.lockResponse?.sessionId ?? '',
       );
       context.push('/passenger-form');
     } else {

@@ -37,6 +37,7 @@ class BookingProvider extends ChangeNotifier {
   CarriageWithSeats? _carriage;
   int _fromStationId = 0;
   int _toStationId = 0;
+  String _sessionId = '';
 
   // ─── Form hành khách ─────────────────────────
   String _passengerName = '';
@@ -99,12 +100,14 @@ class BookingProvider extends ChangeNotifier {
     required CarriageWithSeats carriage,
     required int fromStationId,
     required int toStationId,
+    required String sessionId,
   }) {
     _trip = trip;
     _seat = seat;
     _carriage = carriage;
     _fromStationId = fromStationId;
     _toStationId = toStationId;
+    _sessionId = sessionId;
 
     // Reset form & submit state
     _resetForm();
@@ -256,7 +259,7 @@ class BookingProvider extends ChangeNotifier {
         paymentMethod: _paymentMethod,
       );
 
-      _bookingResult = await _bookingService.createBooking(request);
+      _bookingResult = await _bookingService.createBooking(request, _sessionId);
       _submitState = BookingSubmitState.success;
 
       // Lưu vé vào local (My Tickets)
