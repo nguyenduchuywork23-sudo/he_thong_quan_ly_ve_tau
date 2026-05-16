@@ -226,9 +226,7 @@ class _CarriageView extends StatelessWidget {
 }
 
 // ══════════════════════════════════════════════
-// CHAIR LAYOUT: Ghế ngồi (soft_seat / hard_seat)
-// Format: "A1"–"A7", rows A-D, 7 cols
-// Layout: [1][2][3] [aisle] [4][5][6][7]
+// CHAIR LAYOUT: Toa Ghế ngồi (Bắt buộc dùng GridView.builder)
 // ══════════════════════════════════════════════
 class _ChairLayout extends StatelessWidget {
   final CarriageWithSeats carriage;
@@ -237,68 +235,28 @@ class _ChairLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Group by row letter
-    final Map<String, List<SeatAvailability>> rows = {};
-    for (final s in carriage.seats) {
-      if (s.seatNumber.isEmpty) continue;
-      final row = s.seatNumber[0];
-      (rows[row] ??= []).add(s);
-    }
-    final sortedRows = rows.keys.toList()..sort();
-
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.cardBorder),
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: carriage.seats.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,      // Chia làm 4 cột ghế rõ ràng
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
       ),
-      padding: const EdgeInsets.all(16),
-      child: Column(children: [
-        // Column headers
-        Row(children: [
-          const SizedBox(width: 24),
-          ...List.generate(7, (i) => Expanded(
-            child: Center(
-              child: Text('${i + 1}',
-                  style: const TextStyle(fontSize: 10, color: AppTheme.textHint)),
-            ),
-          )),
-        ]),
-        const SizedBox(height: 8),
-        ...sortedRows.map((rowKey) {
-          final seats = rows[rowKey]!
-            ..sort((a, b) {
-              final an = int.tryParse(a.seatNumber.substring(1)) ?? 0;
-              final bn = int.tryParse(b.seatNumber.substring(1)) ?? 0;
-              return an.compareTo(bn);
-            });
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 3),
-            child: Row(children: [
-              SizedBox(
-                width: 24,
-                child: Text(rowKey,
-                    style: const TextStyle(
-                        fontSize: 11, color: AppTheme.textHint,
-                        fontWeight: FontWeight.w600)),
-              ),
-              // Seats 1-3
-              ...seats.take(3).map((s) => Expanded(child: _SeatWidget(seat: s, tp: tp))),
-              // Aisle
-              const SizedBox(width: 12),
-              // Seats 4-7
-              ...seats.skip(3).map((s) => Expanded(child: _SeatWidget(seat: s, tp: tp))),
-            ]),
-          );
-        }),
-      ]),
+      itemBuilder: (context, index) {
+        return _SeatWidget(
+          seat: carriage.seats[index],
+          tp: tp,
+        );
+      },
     );
   }
 }
 
 // ══════════════════════════════════════════════
-// BERTH LAYOUT: Giường nằm (hard_berth_6 / soft_berth_4)
-// Format: "1A-L", "1A-M", "1A-U", "1B-L", ...
+// BERTH LAYOUT: Toa Giường nằm 
+// (Sử dụng chung cấu trúc GridView nhưng chia 2 cột cho giường nằm)
 // ══════════════════════════════════════════════
 class _BerthLayout extends StatelessWidget {
   final CarriageWithSeats carriage;
@@ -307,194 +265,90 @@ class _BerthLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Group by compartment number
-    final Map<int, List<SeatAvailability>> compartments = {};
-    for (final s in carriage.seats) {
-      final match = RegExp(r'^(\d+)').firstMatch(s.seatNumber);
-      final comp = int.tryParse(match?.group(1) ?? '0') ?? 0;
-      (compartments[comp] ??= []).add(s);
-    }
-    final sorted = compartments.keys.toList()..sort();
-
-    final tiers = carriage.carriageType == 'soft_berth_4'
-        ? ['U', 'L']
-        : ['U', 'M', 'L'];
-    final tierLabels = {'U': 'Trên', 'M': 'Giữa', 'L': 'Dưới'};
-
-    return Column(
-      children: sorted.map((compNum) {
-        final seats = compartments[compNum]!;
-        final sideA = seats.where((s) => s.seatNumber.contains('A')).toList();
-        final sideB = seats.where((s) => s.seatNumber.contains('B')).toList();
-
-        SeatAvailability? find(List<SeatAvailability> side, String tier) {
-          try {
-            return side.firstWhere((s) => s.seatNumber.endsWith('-$tier'));
-          } catch (_) {
-            return null;
-          }
-        }
-
-        return Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          decoration: BoxDecoration(
-            color: AppTheme.cardColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppTheme.cardBorder),
-          ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-              child: Text('Khoang $compNum',
-                  style: const TextStyle(fontSize: 12, color: AppTheme.textHint,
-                      fontWeight: FontWeight.w600)),
-            ),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                children: tiers.map((tier) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 3),
-                  child: Row(children: [
-                    SizedBox(width: 36,
-                      child: Text(tierLabels[tier] ?? tier,
-                          style: const TextStyle(fontSize: 10, color: AppTheme.textHint))),
-                    Expanded(child: _BerthSlot(seat: find(sideA, tier), tp: tp,
-                        label: '${compNum}A-$tier')),
-                    const SizedBox(width: 8),
-                    Expanded(child: _BerthSlot(seat: find(sideB, tier), tp: tp,
-                        label: '${compNum}B-$tier')),
-                  ]),
-                )).toList(),
-              ),
-            ),
-          ]),
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: carriage.seats.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,      // Giường nằm chia 2 cột cho phù hợp kích thước
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 2.0,  // Kéo dài hiển thị giường nằm
+      ),
+      itemBuilder: (context, index) {
+        return _SeatWidget(
+          seat: carriage.seats[index],
+          tp: tp,
         );
-      }).toList(),
+      },
     );
   }
 }
 
 // ══════════════════════════════════════════════
-// SEAT WIDGET (ghế ngồi)
+// SEAT WIDGET: Định nghĩa Widget ghế độc lập
 // ══════════════════════════════════════════════
 class _SeatWidget extends StatelessWidget {
   final SeatAvailability seat;
   final TripProvider tp;
+  
   const _SeatWidget({required this.seat, required this.tp});
 
   @override
   Widget build(BuildContext context) {
     final isSelected = tp.selectedSeat?.id == seat.id;
-    final isLocked = tp.isSeatLocked && isSelected;
+    final isAvailable = seat.isAvailable;
 
     Color bgColor;
     Color borderColor;
-    if (!seat.isAvailable) {
-      bgColor = AppTheme.seatBooked;
+
+    // Phân nhánh màu sắc theo trạng thái thực tế
+    if (!isAvailable) {
+      bgColor = AppTheme.seatBooked; // Đã đặt: Màu xám
       borderColor = AppTheme.seatBooked;
     } else if (isSelected) {
-      bgColor = AppTheme.seatSelected;
+      bgColor = AppTheme.seatSelected; // Đang chọn: Màu cam đỏ
       borderColor = AppTheme.seatSelected;
     } else {
-      bgColor = AppTheme.seatAvailable.withOpacity(0.15);
-      borderColor = AppTheme.seatAvailable;
+      bgColor = Colors.transparent; 
+      borderColor = AppTheme.seatAvailable; // Trống: Xanh lá viền mỏng
     }
 
-    return GestureDetector(
-      onTap: () {
-        if (!seat.isAvailable) return;
-        final carriage = tp.carriages.firstWhere(
-          (c) => c.seats.any((s) => s.id == seat.id),
-          orElse: () => tp.carriages.first,
-        );
-        tp.tapSeat(seat, carriage);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        margin: const EdgeInsets.all(2),
-        height: 36,
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: borderColor, width: 1.5),
-        ),
-        child: Center(
-          child: Text(
-            seat.seatNumber.length > 3
-                ? seat.seatNumber.substring(seat.seatNumber.length - 2)
-                : seat.seatNumber,
-            style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-              color: (!seat.isAvailable)
-                  ? AppTheme.textHint
-                  : isSelected
-                      ? Colors.white
-                      : AppTheme.seatAvailable,
-            ),
+    // Bọc trong Center để Container bên trong giữ được cứng width: 45, height: 45
+    // thay vì bị GridView ép stretch lấp đầy ô.
+    return Center(
+      child: GestureDetector(
+        onTap: () {
+          if (!isAvailable) return; // Không cho click nếu đã đặt
+          
+          // Lấy carriage hiện tại chứa ghế này để truyền vào tapSeat
+          final carriage = tp.carriages.firstWhere(
+            (c) => c.seats.any((s) => s.id == seat.id),
+            orElse: () => tp.carriages.first,
+          );
+          
+          // Gọi hàm tapSeat đã định nghĩa sẵn trong TripProvider
+          tp.tapSeat(seat, carriage);
+        },
+        child: Container(
+          width: 45,
+          height: 45,
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: borderColor, width: 1.0),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Berth slot (giường nằm) ──
-class _BerthSlot extends StatelessWidget {
-  final SeatAvailability? seat;
-  final TripProvider tp;
-  final String label;
-  const _BerthSlot({required this.seat, required this.tp, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    if (seat == null) {
-      return Container(
-        height: 40,
-        decoration: BoxDecoration(
-          color: AppTheme.background,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppTheme.cardBorder),
-        ),
-        child: const Center(
-          child: Text('N/A', style: TextStyle(fontSize: 10, color: AppTheme.textHint)),
-        ),
-      );
-    }
-    final isSelected = tp.selectedSeat?.id == seat!.id;
-    Color bg = seat!.isAvailable
-        ? (isSelected ? AppTheme.seatSelected : AppTheme.seatAvailable.withOpacity(0.15))
-        : AppTheme.seatBooked;
-    Color border = seat!.isAvailable
-        ? (isSelected ? AppTheme.seatSelected : AppTheme.seatAvailable)
-        : AppTheme.seatBooked;
-
-    return GestureDetector(
-      onTap: () {
-        if (!seat!.isAvailable) return;
-        final carriage = tp.carriages.firstWhere(
-          (c) => c.seats.any((s) => s.id == seat!.id),
-          orElse: () => tp.carriages.first,
-        );
-        tp.tapSeat(seat!, carriage);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        height: 40,
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: border, width: 1.5),
-        ),
-        child: Center(
-          child: Text(
-            NumberFormat.currency(locale: 'vi_VN', symbol: '₫', decimalDigits: 0)
-                .format(seat!.price),
-            style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w600,
-              color: isSelected ? Colors.white : AppTheme.textSecondary,
+          child: Center(
+            child: Text(
+              seat.seatNumber,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: !isAvailable 
+                    ? Colors.white // Đã đặt -> text trắng
+                    : (isSelected ? Colors.white : AppTheme.seatAvailable), // Trống -> text xanh
+              ),
             ),
           ),
         ),
