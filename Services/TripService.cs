@@ -15,6 +15,7 @@ namespace VetauBackend.Services
         Task<object> SearchTripsAsync(SearchTripRequest req);
         Task<object> GetAvailableSeatsAsync(int tripId);
         Task<bool> LockSeatAsync(LockSeatRequest req, string sessionId, int? userId);
+        Task<List<VetauBackend.Models.Station>> GetStationsAsync();
     }
 
     public class TripService : ITripService
@@ -147,6 +148,17 @@ namespace VetauBackend.Services
             _context.SeatLocks.Add(seatLock);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        /// <summary>
+        /// Trả danh sách ga active — dùng cho StationPicker (public, không cần auth)
+        /// </summary>
+        public async Task<List<VetauBackend.Models.Station>> GetStationsAsync()
+        {
+            return await _context.Stations
+                .Where(s => s.IsActive)
+                .OrderBy(s => s.SortOrder)
+                .ToListAsync();
         }
     }
 }

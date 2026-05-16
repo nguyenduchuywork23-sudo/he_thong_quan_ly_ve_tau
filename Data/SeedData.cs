@@ -30,6 +30,20 @@ namespace VetauBackend.Data
                 context.SaveChanges();
             }
 
+            // Seed Staff account
+            if (!context.Users.Any(u => u.Role == "staff"))
+            {
+                context.Users.Add(new User
+                {
+                    Email = "staff@vetau.vn",
+                    FullName = "Nhân Viên Quản Lý",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("staff123456"),
+                    Role = "staff",
+                    IsActive = true
+                });
+                context.SaveChanges();
+            }
+
             // 2. Price Multipliers
             if (!context.PriceMultipliers.Any())
             {

@@ -89,6 +89,16 @@ namespace VetauBackend.Controllers
 
             return Ok(new { SessionId = sessionId.ToString(), Message = "Giữ chỗ thành công. Bạn có 15 phút để thanh toán." });
         }
+
+        /// <summary>
+        /// GET /api/Trips/stations — Public endpoint cho StationPicker (không cần auth)
+        /// </summary>
+        [HttpGet("stations")]
+        public async Task<IActionResult> GetStations()
+        {
+            var stations = await _tripService.GetStationsAsync();
+            return Ok(stations);
+        }
     }
 
     [ApiController]
@@ -151,9 +161,13 @@ namespace VetauBackend.Controllers
         }
     }
 
+    /// <summary>
+    /// AdminController — Chỉ admin mới truy cập được.
+    /// Staff KHÔNG có quyền CRUD ga tàu, tàu, hoặc xem toàn bộ bookings qua admin.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "admin,staff")]
+    [Authorize(Roles = "admin")]
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _adminService;
@@ -216,12 +230,99 @@ namespace VetauBackend.Controllers
             return Ok(bookings);
         }
 
+        /// <summary>
+        /// PUT /api/Admin/bookings/{id}/status
+        /// FE gửi body: {"Status": "Confirmed"} hoặc {"Status": "Cancelled"}
+        /// </summary>
         [HttpPut("bookings/{id}/status")]
-        public async Task<IActionResult> UpdateBookingStatus(int id, [FromBody] string status)
+        public async Task<IActionResult> UpdateBookingStatus(int id, [FromBody] UpdateStatusRequest req)
         {
-            var result = await _adminService.UpdateBookingStatusAsync(id, status);
+            if (string.IsNullOrWhiteSpace(req?.Status))
+                return BadRequest(new { Message = "Thiếu trạng thái mới." });
+
+            var result = await _adminService.UpdateBookingStatusAsync(id, req.Status);
             if (!result) return NotFound();
             return Ok(new { Message = "Đã cập nhật trạng thái đơn vé." });
+        }
+    }
+
+    /// <summary>
+    /// StaffController — Quản lý tầng giữa.
+    /// Staff và Admin đều truy cập được.
+    /// Chức năng: duyệt đơn vé, xem thống kê khách, xem chuyến đang chạy.
+    /// </summary>
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize(Roles = "admin,staff")]
+    public class StaffController : ControllerBase
+    {
+        private readonly IStaffService _staffService;
+
+        public StaffController(IStaffService staffService)
+        {
+            _staffService = staffService;
+        }
+
+        /// <summary>
+        /// GET /api/Staff/dashboard — Dashboard tổng hợp cho staff
+        /// </summary>
+        [HttpGet("dashboard")]
+        public async Task<IActionResult> GetDashboard()
+        {
+            var stats = await _staffService.GetStaffDashboardAsync();
+            return Ok(stats);
+        }
+
+        /// <summary>
+        /// GET /api/Staff/pending-bookings — Danh sách đơn vé chờ duyệt
+        /// </summary>
+        [HttpGet("pending-bookings")]
+        public async Task<IActionResult> GetPendingBookings()
+        {
+            var bookings = await _staffService.GetPendingBookingsAsync();
+            return Ok(bookings);
+        }
+
+        /// <summary>
+        /// PUT /api/Staff/bookings/{id}/approve — Duyệt đơn vé
+        /// </summary>
+        [HttpPut("bookings/{id}/approve")]
+        public async Task<IActionResult> ApproveBooking(int id)
+        {
+            var result = await _staffService.ApproveBookingAsync(id);
+            if (!result) return NotFound(new { Message = "Đơn vé không tồn tại hoặc không ở trạng thái chờ duyệt." });
+            return Ok(new { Message = "Đã duyệt đơn vé thành công." });
+        }
+
+        /// <summary>
+        /// PUT /api/Staff/bookings/{id}/reject — Từ chối đơn vé
+        /// </summary>
+        [HttpPut("bookings/{id}/reject")]
+        public async Task<IActionResult> RejectBooking(int id, [FromBody] RejectBookingRequest? req)
+        {
+            var result = await _staffService.RejectBookingAsync(id, req?.Reason);
+            if (!result) return NotFound(new { Message = "Đơn vé không tồn tại hoặc không ở trạng thái chờ duyệt." });
+            return Ok(new { Message = "Đã từ chối đơn vé." });
+        }
+
+        /// <summary>
+        /// GET /api/Staff/passenger-stats — Thống kê số khách hiện tại
+        /// </summary>
+        [HttpGet("passenger-stats")]
+        public async Task<IActionResult> GetPassengerStats()
+        {
+            var stats = await _staffService.GetPassengerStatsAsync();
+            return Ok(stats);
+        }
+
+        /// <summary>
+        /// GET /api/Staff/active-trips — Chuyến tàu đang di chuyển theo giờ
+        /// </summary>
+        [HttpGet("active-trips")]
+        public async Task<IActionResult> GetActiveTrips()
+        {
+            var trips = await _staffService.GetActiveTripsAsync();
+            return Ok(trips);
         }
     }
 }

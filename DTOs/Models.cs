@@ -48,4 +48,22 @@ namespace VetauBackend.DTOs
         
         public string PaymentMethod { get; set; } = "qr_transfer";
     }
+
+    /// <summary>
+    /// DTO cho PUT /api/Admin/bookings/{id}/status
+    /// FE gửi {"Status": "Confirmed"} hoặc {"Status": "Cancelled"}
+    /// </summary>
+    public class UpdateStatusRequest
+    {
+        public string Status { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// DTO cho PUT /api/Staff/bookings/{id}/reject
+    /// </summary>
+    public class RejectBookingRequest
+    {
+        public string? Reason { get; set; }
+    }
 }
+
