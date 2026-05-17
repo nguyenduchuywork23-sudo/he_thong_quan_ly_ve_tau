@@ -224,9 +224,9 @@ namespace VetauBackend.Controllers
 
         // --- BOOKINGS ---
         [HttpGet("bookings")]
-        public async Task<IActionResult> GetBookings()
+        public async Task<IActionResult> GetBookings([FromQuery] int page = 1, [FromQuery] int pageSize = 50, [FromQuery] string? status = null, [FromQuery] string? search = null)
         {
-            var bookings = await _adminService.GetBookingsAsync();
+            var bookings = await _adminService.GetBookingsAsync(page, pageSize, status, search);
             return Ok(bookings);
         }
 

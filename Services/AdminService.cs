@@ -20,7 +20,7 @@ namespace VetauBackend.Services
         Task<List<Train>> GetTrainsAsync();
 
         // Quản lý Đơn vé (Bookings)
-        Task<object> GetBookingsAsync();
+        Task<object> GetBookingsAsync(int page = 1, int pageSize = 50, string? status = null, string? search = null);
         Task<bool> UpdateBookingStatusAsync(int id, string status);
         
         // Thống kê Dashboard
@@ -85,20 +85,40 @@ namespace VetauBackend.Services
 
         /// <summary>
         /// Trả về flat DTO cho FE AdminBooking.fromJson — include đầy đủ
-        /// Trip.Train, FromStation, ToStation, Seat, Carriage
+        /// Trip.Train, FromStation, ToStation, Seat, Carriage. Hỗ trợ phân trang và lọc.
         /// </summary>
-        public async Task<object> GetBookingsAsync()
+        public async Task<object> GetBookingsAsync(int page = 1, int pageSize = 50, string? status = null, string? search = null)
         {
-            var bookings = await _context.Bookings
+            var query = _context.Bookings
                 .Include(b => b.Trip).ThenInclude(t => t.Train)
                 .Include(b => b.FromStation)
                 .Include(b => b.ToStation)
                 .Include(b => b.Seat)
                 .Include(b => b.Carriage)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(status) && status.ToLower() != "all")
+            {
+                query = query.Where(b => b.Status.ToLower() == status.ToLower());
+            }
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                var s = search.ToLower();
+                query = query.Where(b => b.BookingCode.ToLower().Contains(s) || 
+                                         b.PassengerName.ToLower().Contains(s) || 
+                                         b.PassengerPhone.Contains(s));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var bookings = await query
                 .OrderByDescending(b => b.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return bookings.Select(b => new
+            var items = bookings.Select(b => new
             {
                 b.Id,
                 b.BookingCode,
@@ -135,6 +155,8 @@ namespace VetauBackend.Services
                 SeatNumber = b.Seat?.SeatNumber ?? "",
                 CarriageType = b.Carriage?.CarriageType ?? ""
             }).ToList();
+
+            return new { items, totalCount };
         }
 
         public async Task<bool> UpdateBookingStatusAsync(int id, string status)

@@ -80,11 +80,19 @@ namespace VetauBackend.Data
             // 4. Routes
             if (!context.Routes.Any())
             {
-                var hnSg = new VetauBackend.Models.Route { Name = "Hà Nội - Sài Gòn", Code = "HN-SG", Description = "Tuyến Thống Nhất Bắc Nam" };
+                // Chiều đi: HN-SG
+                var hnSg = new VetauBackend.Models.Route { Name = "Hà Nội - Sài Gòn", Code = "HN-SG", Description = "Tuyến Thống Nhất Bắc Nam (Chiều đi)" };
                 context.Routes.Add(hnSg);
+                
+                // Chiều về: SG-HN
+                var sgHn = new VetauBackend.Models.Route { Name = "Sài Gòn - Hà Nội", Code = "SG-HN", Description = "Tuyến Thống Nhất Bắc Nam (Chiều về)" };
+                context.Routes.Add(sgHn);
+                
                 context.SaveChanges();
 
                 var stations = context.Stations.OrderBy(s => s.SortOrder).ToList();
+                
+                // Trạm cho chiều HN-SG
                 int order = 1;
                 foreach (var st in stations)
                 {
@@ -93,46 +101,71 @@ namespace VetauBackend.Data
                         RouteId = hnSg.Id,
                         StationId = st.Id,
                         StopOrder = order++,
-                        DistanceKm = (order - 1) * 100 // Giả lập khoảng cách
+                        DistanceKm = (order - 1) * 100
                     });
                 }
+
+                // Trạm cho chiều SG-HN (đảo ngược lại)
+                var reverseStations = stations.AsEnumerable().Reverse().ToList();
+                int revOrder = 1;
+                foreach (var st in reverseStations)
+                {
+                    context.RouteStations.Add(new RouteStation
+                    {
+                        RouteId = sgHn.Id,
+                        StationId = st.Id,
+                        StopOrder = revOrder++,
+                        DistanceKm = (revOrder - 1) * 100
+                    });
+                }
+
                 context.SaveChanges();
             }
 
             // 5. Trains & Carriages & Seats
             if (!context.Trains.Any())
             {
+                // --- TÀU SE1 ---
                 var se1 = new Train { Name = "SE1", Code = "SE1", TrainType = "express", TotalCarriages = 5 };
                 context.Trains.Add(se1);
+                
+                // --- TÀU SE2 ---
+                var se2 = new Train { Name = "SE2", Code = "SE2", TrainType = "express", TotalCarriages = 5 };
+                context.Trains.Add(se2);
                 context.SaveChanges();
 
-                // Tạo toa
+                // Tạo toa cho cả 2 tàu
+                var trains = new[] { se1, se2 };
                 var carriageTypes = new[] { "soft_seat", "soft_seat", "hard_berth_6", "soft_berth_4", "vip" };
-                for (int i = 0; i < carriageTypes.Length; i++)
+                
+                foreach (var tr in trains)
                 {
-                    var c = new Carriage
+                    for (int i = 0; i < carriageTypes.Length; i++)
                     {
-                        TrainId = se1.Id,
-                        CarriageNumber = i + 1,
-                        CarriageType = carriageTypes[i],
-                        TotalSeats = carriageTypes[i].Contains("seat") ? 64 : (carriageTypes[i].Contains("6") ? 42 : 28)
-                    };
-                    if (c.CarriageType == "vip") c.TotalSeats = 16;
-                    context.Carriages.Add(c);
-                    context.SaveChanges();
-
-                    // Tạo ghế cho toa này
-                    var seats = new List<Seat>();
-                    for (int s = 1; s <= c.TotalSeats; s++)
-                    {
-                        seats.Add(new Seat
+                        var c = new Carriage
                         {
-                            CarriageId = c.Id,
-                            SeatNumber = $"{i + 1}-{(c.CarriageType.Contains("berth") ? "G" : "")}{s}",
-                            Floor = c.CarriageType.Contains("berth") ? ((s - 1) % 2) + 1 : 1
-                        });
+                            TrainId = tr.Id,
+                            CarriageNumber = i + 1,
+                            CarriageType = carriageTypes[i],
+                            TotalSeats = carriageTypes[i].Contains("seat") ? 64 : (carriageTypes[i].Contains("6") ? 42 : 28)
+                        };
+                        if (c.CarriageType == "vip") c.TotalSeats = 16;
+                        context.Carriages.Add(c);
+                        context.SaveChanges();
+
+                        // Tạo ghế cho toa này
+                        var seats = new List<Seat>();
+                        for (int s = 1; s <= c.TotalSeats; s++)
+                        {
+                            seats.Add(new Seat
+                            {
+                                CarriageId = c.Id,
+                                SeatNumber = $"{i + 1}-{(c.CarriageType.Contains("berth") ? "G" : "")}{s}",
+                                Floor = c.CarriageType.Contains("berth") ? ((s - 1) % 2) + 1 : 1
+                            });
+                        }
+                        context.Seats.AddRange(seats);
                     }
-                    context.Seats.AddRange(seats);
                 }
                 context.SaveChanges();
             }
@@ -140,17 +173,21 @@ namespace VetauBackend.Data
             // 6. Trips
             if (!context.Trips.Any())
             {
-                var train = context.Trains.FirstOrDefault(t => t.Code == "SE1");
-                var route = context.Routes.FirstOrDefault(r => r.Code == "HN-SG");
-                if (train != null && route != null)
+                var trainSE1 = context.Trains.FirstOrDefault(t => t.Code == "SE1");
+                var trainSE2 = context.Trains.FirstOrDefault(t => t.Code == "SE2");
+                var routeHnSg = context.Routes.FirstOrDefault(r => r.Code == "HN-SG");
+                var routeSgHn = context.Routes.FirstOrDefault(r => r.Code == "SG-HN");
+                
+                if (trainSE1 != null && routeHnSg != null)
                 {
-                    for (int i = 1; i <= 10; i++)
+                    // Chuyến SE1 (HN-SG)
+                    for (int i = 0; i <= 10; i++)
                     {
                         var tripDate = DateTime.UtcNow.Date.AddDays(i);
                         context.Trips.Add(new Trip
                         {
-                            TrainId = train.Id,
-                            RouteId = route.Id,
+                            TrainId = trainSE1.Id,
+                            RouteId = routeHnSg.Id,
                             DepartureDate = tripDate,
                             DepartureTime = "19:30",
                             ArrivalTime = "04:30",
@@ -159,7 +196,75 @@ namespace VetauBackend.Data
                             Status = "scheduled"
                         });
                     }
+
+                    // Chuyến SE2 (SG-HN)
+                    if (trainSE2 != null && routeSgHn != null)
+                    {
+                        for (int i = 0; i <= 10; i++)
+                        {
+                            var tripDate = DateTime.UtcNow.Date.AddDays(i);
+                            context.Trips.Add(new Trip
+                            {
+                                TrainId = trainSE2.Id,
+                                RouteId = routeSgHn.Id,
+                                DepartureDate = tripDate,
+                                DepartureTime = "20:00",
+                                ArrivalTime = "05:00",
+                                DurationMinutes = 1980,
+                                BasePrice = 800000,
+                                Status = "scheduled"
+                            });
+                        }
+                    }
                     context.SaveChanges();
+                }
+            }
+
+            // 7. Bookings (Đơn vé mẫu)
+            if (!context.Bookings.Any())
+            {
+                var todayTrip = context.Trips.FirstOrDefault(t => t.DepartureDate.Date == DateTime.UtcNow.Date);
+                if (todayTrip != null)
+                {
+                    var carriage = context.Carriages.Include(c => c.Seats).FirstOrDefault(c => c.TrainId == todayTrip.TrainId);
+                    var hnStation = context.Stations.FirstOrDefault(s => s.Code == "HAN");
+                    var sgStation = context.Stations.FirstOrDefault(s => s.Code == "SGN");
+                    var adminUser = context.Users.FirstOrDefault(u => u.Role == "admin");
+
+                    if (carriage != null && hnStation != null && sgStation != null && adminUser != null)
+                    {
+                        var seatsToBook = carriage.Seats.Take(3).ToList();
+                        foreach (var seat in seatsToBook)
+                        {
+                            context.Bookings.Add(new Booking
+                            {
+                                BookingCode = "VT" + DateTime.Now.ToString("yyyyMMdd") + new Random().Next(100, 999).ToString(),
+                                UserId = adminUser.Id,
+                                TripId = todayTrip.Id,
+                                FromStationId = hnStation.Id,
+                                ToStationId = sgStation.Id,
+                                SeatId = seat.Id,
+                                CarriageId = carriage.Id,
+                                PassengerName = "Nguyễn Văn Khách",
+                                PassengerIdCard = "012345678912",
+                                PassengerPhone = "0987654321",
+                                PassengerEmail = "khach@gmail.com",
+                                PassengerType = "adult",
+                                BasePrice = todayTrip.BasePrice,
+                                DiscountPercent = 0,
+                                DiscountAmount = 0,
+                                FinalPrice = todayTrip.BasePrice,
+                                Status = "confirmed",
+                                PaymentMethod = "qr_transfer",
+                                PaymentDeadline = DateTime.UtcNow.AddMinutes(30),
+                                PaidAt = DateTime.UtcNow,
+                                QrCodeData = "dummy_qr_data",
+                                CreatedAt = DateTime.UtcNow,
+                                UpdatedAt = DateTime.UtcNow
+                            });
+                        }
+                        context.SaveChanges();
+                    }
                 }
             }
         }

@@ -102,45 +102,50 @@ namespace VetauBackend.Services
         /// <summary>
         /// Thống kê số khách hiện tại:
         /// - Tổng khách có booking hôm nay
-        /// - Pending / Confirmed / Cancelled
-        /// - Tổng khách tất cả
+        /// - Số khách trên tàu (chuyến đang chạy)
+        /// - Số khách đang chờ (chuyến chưa khởi hành)
         /// </summary>
         public async Task<object> GetPassengerStatsAsync()
         {
             var today = DateTime.UtcNow.Date;
+            var currentTime = DateTime.UtcNow.ToString("HH:mm");
 
-            var totalPassengersToday = await _context.Bookings
+            var totalPassengers = await _context.Bookings
                 .CountAsync(b => b.CreatedAt.Date == today);
 
-            var pendingToday = await _context.Bookings
-                .CountAsync(b => b.Status == "pending" && b.CreatedAt.Date == today);
+            var tripsToday = await _context.Trips
+                .Where(t => t.Status == "scheduled" && t.DepartureDate.Date == today)
+                .ToListAsync();
 
-            var confirmedToday = await _context.Bookings
-                .CountAsync(b => b.Status == "confirmed" && b.CreatedAt.Date == today);
+            var tripIds = tripsToday.Select(t => t.Id).ToList();
 
-            var cancelledToday = await _context.Bookings
-                .CountAsync(b => (b.Status == "cancelled" || b.Status == "rejected") && b.CreatedAt.Date == today);
+            var passengerCounts = await _context.Bookings
+                .Where(b => tripIds.Contains(b.TripId) && (b.Status == "confirmed" || b.Status == "pending"))
+                .GroupBy(b => b.TripId)
+                .Select(g => new { TripId = g.Key, Count = g.Count() })
+                .ToListAsync();
+            
+            var countDict = passengerCounts.ToDictionary(x => x.TripId, x => x.Count);
 
-            var totalConfirmedAllTime = await _context.Bookings
-                .CountAsync(b => b.Status == "confirmed");
+            int onBoardCount = 0;
+            int waitingCount = 0;
 
-            var totalPendingAllTime = await _context.Bookings
-                .CountAsync(b => b.Status == "pending");
+            foreach (var t in tripsToday)
+            {
+                var count = countDict.ContainsKey(t.Id) ? countDict[t.Id] : 0;
+                var isDeparted = string.Compare(currentTime, t.DepartureTime, StringComparison.Ordinal) >= 0;
+                if (isDeparted) {
+                    onBoardCount += count;
+                } else {
+                    waitingCount += count;
+                }
+            }
 
             return new
             {
-                Today = new
-                {
-                    Total = totalPassengersToday,
-                    Pending = pendingToday,
-                    Confirmed = confirmedToday,
-                    Cancelled = cancelledToday
-                },
-                AllTime = new
-                {
-                    TotalConfirmed = totalConfirmedAllTime,
-                    TotalPending = totalPendingAllTime
-                }
+                TotalPassengers = totalPassengers,
+                OnBoardCount = onBoardCount,
+                WaitingCount = waitingCount
             };
         }
 
@@ -157,7 +162,7 @@ namespace VetauBackend.Services
 
             var trips = await _context.Trips
                 .Include(t => t.Train)
-                .Include(t => t.Route)
+                .Include(t => t.Route).ThenInclude(r => r.RouteStations).ThenInclude(rs => rs.Station)
                 .Where(t => t.Status == "scheduled" && t.DepartureDate.Date == today)
                 .ToListAsync();
 
@@ -174,12 +179,18 @@ namespace VetauBackend.Services
             var result = trips.Select(t =>
             {
                 var isDeparted = string.Compare(currentTime, t.DepartureTime, StringComparison.Ordinal) >= 0;
+                
+                var firstStation = t.Route?.RouteStations.OrderBy(rs => rs.StopOrder).FirstOrDefault()?.Station?.Name ?? t.Route?.Name ?? "";
+                var lastStation = t.Route?.RouteStations.OrderByDescending(rs => rs.StopOrder).FirstOrDefault()?.Station?.Name ?? "";
+
                 return new
                 {
                     t.Id,
                     TrainName = t.Train?.Name ?? "",
                     TrainCode = t.Train?.Code ?? "",
                     RouteName = t.Route?.Name ?? "",
+                    FromStation = firstStation,
+                    ToStation = lastStation,
                     t.DepartureTime,
                     t.ArrivalTime,
                     t.DurationMinutes,
@@ -192,15 +203,7 @@ namespace VetauBackend.Services
             .OrderBy(t => t.DepartureTime)
             .ToList();
 
-            return new
-            {
-                CurrentTime = currentTime,
-                TotalTripsToday = trips.Count,
-                InTransit = result.Count(t => t.Status == "in_transit"),
-                Waiting = result.Count(t => t.Status == "waiting"),
-                TotalPassengers = result.Sum(t => t.PassengerCount),
-                Trips = result
-            };
+            return result;
         }
 
         /// <summary>
@@ -213,6 +216,8 @@ namespace VetauBackend.Services
             var pendingBookings = await _context.Bookings.CountAsync(b => b.Status == "pending");
             var confirmedToday = await _context.Bookings
                 .CountAsync(b => b.Status == "confirmed" && b.PaidAt != null && b.PaidAt.Value.Date == today);
+            var cancelledToday = await _context.Bookings
+                .CountAsync(b => (b.Status == "cancelled" || b.Status == "rejected") && b.CreatedAt.Date == today);
             var totalPassengersToday = await _context.Bookings
                 .CountAsync(b => b.CreatedAt.Date == today);
             var activeTrips = await _context.Trips
@@ -225,9 +230,10 @@ namespace VetauBackend.Services
             {
                 PendingBookings = pendingBookings,
                 ConfirmedToday = confirmedToday,
+                CancelledToday = cancelledToday,
                 TotalPassengersToday = totalPassengersToday,
                 ActiveTrips = activeTrips,
-                TodayRevenue = todayRevenue
+                RevenueToday = todayRevenue
             };
         }
     }
