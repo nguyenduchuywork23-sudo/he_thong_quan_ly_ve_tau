@@ -66,9 +66,9 @@ class _HomeScreenState extends State<HomeScreen>
       lastDate: now.add(const Duration(days: 90)),
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
-          colorScheme: const ColorScheme.dark(
+          colorScheme: const ColorScheme.light(
             primary: AppTheme.primary,
-            surface: AppTheme.cardColor,
+            surface: AppTheme.surface,
             onSurface: AppTheme.textPrimary,
           ),
         ),
@@ -125,21 +125,27 @@ class _HomeScreenState extends State<HomeScreen>
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const SizedBox(height: AppTheme.spacingL),
-                _Header(),
-                const SizedBox(height: 32),
-                Text('Chuyến đi nào\nbạn muốn?',
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(height: 1.2)),
-                const SizedBox(height: 6),
-                const Text('Đặt vé tàu nhanh chóng, an toàn',
-                    style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
-                const SizedBox(height: AppTheme.spacingL),
-                _buildCard(),
-                const SizedBox(height: AppTheme.spacingL),
-                _buildSearchBtn(),
-                const SizedBox(height: 40),
-              ]),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const SizedBox(height: AppTheme.spacingL),
+                    _Header(),
+                    const SizedBox(height: 32),
+                    Text('Chuyến đi nào\nbạn muốn?',
+                        style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                            height: 1.2, color: AppTheme.textPrimary, fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 6),
+                    const Text('Đặt vé tàu nhanh chóng, an toàn',
+                        style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
+                    const SizedBox(height: AppTheme.spacingL),
+                    _buildCard(),
+                    const SizedBox(height: AppTheme.spacingL),
+                    _buildSearchBtn(),
+                    const SizedBox(height: 40),
+                  ]),
+                ),
+              ),
             ),
           ),
         ],
@@ -150,10 +156,10 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildCard() {
     return Container(
       decoration: BoxDecoration(
-        gradient: AppTheme.cardGradient,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-        border: Border.all(color: AppTheme.cardBorder),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 8))],
+        border: Border.all(color: AppTheme.cardBorder, width: 0.5),
+        boxShadow: AppTheme.softShadow,
       ),
       padding: const EdgeInsets.all(AppTheme.spacingM),
       child: Column(children: [
@@ -239,14 +245,14 @@ class _HomeScreenState extends State<HomeScreen>
     return Consumer<TripProvider>(builder: (ctx, tp, _) {
       return Container(
         decoration: BoxDecoration(
-          gradient: AppTheme.primaryGradient,
-          borderRadius: BorderRadius.circular(AppTheme.radiusButton),
-          boxShadow: [BoxShadow(color: AppTheme.primary.withOpacity(0.4), blurRadius: 16, offset: const Offset(0, 6))],
+          boxShadow: AppTheme.softShadow,
         ),
         child: ElevatedButton(
           onPressed: tp.isSearchLoading ? null : _search,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent, shadowColor: Colors.transparent,
+            backgroundColor: AppTheme.primary, shadowColor: Colors.transparent,
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusButton)),
             minimumSize: const Size(double.infinity, 58)),
           child: tp.isSearchLoading
               ? const SizedBox(width: 22, height: 22,

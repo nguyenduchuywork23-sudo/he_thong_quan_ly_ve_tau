@@ -107,7 +107,7 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
 
     return RefreshIndicator(
       color: AppTheme.primary,
-      backgroundColor: AppTheme.cardColor,
+      backgroundColor: AppTheme.surface,
       onRefresh: () => ap.loadBookings(force: true),
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -183,7 +183,7 @@ class _FilterBar extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 7),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppTheme.primary : AppTheme.cardColor,
+                      color: isSelected ? AppTheme.primary : AppTheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isSelected
@@ -255,12 +255,15 @@ class _AdminBookingCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         decoration: BoxDecoration(
-          color: AppTheme.cardColor,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(AppTheme.radiusCard),
           border: Border.all(
             color: booking.isPending
                 ? AppTheme.warning.withOpacity(0.4)
-                : AppTheme.cardBorder),
+                : AppTheme.cardBorder,
+            width: 0.5,
+          ),
+          boxShadow: AppTheme.softShadow,
         ),
         child: Column(children: [
           // ── Header ────────────────────────────
@@ -389,7 +392,7 @@ class _BookingActionDialog extends StatelessWidget {
         locale: 'vi_VN', symbol: '₫', decimalDigits: 0);
 
     return AlertDialog(
-      backgroundColor: AppTheme.cardColor,
+      backgroundColor: AppTheme.surface,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: AppTheme.cardBorder)),

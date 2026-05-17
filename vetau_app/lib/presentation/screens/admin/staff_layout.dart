@@ -68,11 +68,7 @@ class _StaffLayoutState extends State<StaffLayout> {
         preferredSize: const Size.fromHeight(60),
         child: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF0D3B2E), Color(0xFF155E42)],
-            ),
+            gradient: AppTheme.heroGradient,
           ),
           child: SafeArea(
             child: Padding(
@@ -94,7 +90,7 @@ class _StaffLayoutState extends State<StaffLayout> {
                 const SizedBox(width: 10),
                 Text(_tabs[_currentIndex].label,
                     style: const TextStyle(fontSize: 17,
-                        fontWeight: FontWeight.w700, color: Colors.white)),
+                        fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
                 const Spacer(),
 
                 // User info
@@ -104,9 +100,9 @@ class _StaffLayoutState extends State<StaffLayout> {
                       children: [
                     Text(user.fullName,
                         style: const TextStyle(fontSize: 12,
-                            fontWeight: FontWeight.w600, color: Colors.white)),
+                            fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
                     const Text('Nhân viên',
-                        style: TextStyle(fontSize: 10, color: Colors.white54)),
+                        style: TextStyle(fontSize: 10, color: AppTheme.textSecondary)),
                   ]),
                   const SizedBox(width: 10),
                 ],
@@ -114,17 +110,17 @@ class _StaffLayoutState extends State<StaffLayout> {
                 // Refresh + Menu
                 IconButton(
                   icon: const Icon(Icons.refresh,
-                      color: Colors.white70, size: 20),
+                      color: AppTheme.textSecondary, size: 20),
                   tooltip: 'Làm mới',
                   onPressed: () => context.read<StaffProvider>().refreshAll(),
                 ),
                 PopupMenuButton<String>(
-                  color: AppTheme.cardColor,
+                  color: AppTheme.surface,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: const BorderSide(color: AppTheme.cardBorder)),
                   icon: const Icon(Icons.more_vert,
-                      color: Colors.white70, size: 20),
+                      color: AppTheme.textSecondary, size: 20),
                   onSelected: (v) async {
                     if (v == 'home') context.go('/');
                     if (v == 'logout') {

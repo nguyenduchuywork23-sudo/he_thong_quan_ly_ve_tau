@@ -219,9 +219,10 @@ class _BookingCodeCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: AppTheme.cardGradient,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-        border: Border.all(color: AppTheme.primary.withOpacity(0.3)),
+        border: Border.all(color: AppTheme.primary.withOpacity(0.3), width: 0.5),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Column(children: [
         const Text('MÃ ĐẶT CHỖ',
@@ -332,9 +333,10 @@ class _TripDetailCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: AppTheme.cardGradient,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-        border: Border.all(color: AppTheme.cardBorder),
+        border: Border.all(color: AppTheme.cardBorder, width: 0.5),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const Text('THÔNG TIN VÉ',

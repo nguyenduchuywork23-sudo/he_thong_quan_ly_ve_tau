@@ -68,11 +68,7 @@ class _AdminLayoutState extends State<AdminLayout> {
         preferredSize: const Size.fromHeight(60),
         child: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF1A1F4E), Color(0xFF252B6B)],
-            ),
+            gradient: AppTheme.heroGradient,
           ),
           child: SafeArea(
             child: Padding(
@@ -96,7 +92,7 @@ class _AdminLayoutState extends State<AdminLayout> {
                 Text(_tabs[_currentIndex].label,
                     style: const TextStyle(fontSize: 17,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white)),
+                        color: AppTheme.textPrimary)),
                 const Spacer(),
 
                 // User info + logout
@@ -107,10 +103,10 @@ class _AdminLayoutState extends State<AdminLayout> {
                     Text(user.fullName,
                         style: const TextStyle(fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white)),
+                            color: AppTheme.textPrimary)),
                     Text(user.role == 'admin' ? 'Quản trị viên' : 'Nhân viên',
                         style: const TextStyle(fontSize: 10,
-                            color: Colors.white54)),
+                            color: AppTheme.textSecondary)),
                   ]),
                   const SizedBox(width: 10),
                 ],
@@ -118,17 +114,17 @@ class _AdminLayoutState extends State<AdminLayout> {
                 // Refresh + Logout buttons
                 IconButton(
                   icon: const Icon(Icons.refresh,
-                      color: Colors.white70, size: 20),
+                      color: AppTheme.textSecondary, size: 20),
                   tooltip: 'Làm mới',
                   onPressed: () => context.read<AdminProvider>().refreshAll(),
                 ),
                 PopupMenuButton<String>(
-                  color: AppTheme.cardColor,
+                  color: AppTheme.surface,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: const BorderSide(color: AppTheme.cardBorder)),
                   icon: const Icon(Icons.more_vert,
-                      color: Colors.white70, size: 20),
+                      color: AppTheme.textSecondary, size: 20),
                   onSelected: (v) async {
                     if (v == 'home') context.go('/');
                     if (v == 'logout') {

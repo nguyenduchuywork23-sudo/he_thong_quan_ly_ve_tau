@@ -233,9 +233,10 @@ class _TripSummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: AppTheme.cardGradient,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-        border: Border.all(color: AppTheme.cardBorder),
+        border: Border.all(color: AppTheme.cardBorder, width: 0.5),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -477,9 +478,10 @@ class _PriceSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.cardColor,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-        border: Border.all(color: AppTheme.cardBorder),
+        border: Border.all(color: AppTheme.cardBorder, width: 0.5),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Column(children: [
         _PriceRow('Giá vé', price.format(seatPrice)),

@@ -154,18 +154,18 @@ class _PendingHighlightCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft, end: Alignment.bottomRight,
-          colors: pendingCount > 0
-              ? [const Color(0xFF1A3E2E), const Color(0xFF22543D)]
-              : [const Color(0xFF1A1F2E), const Color(0xFF252B3B)],
-        ),
+        gradient: pendingCount > 0 ? AppTheme.primaryGradient : null,
+        color: pendingCount > 0 ? null : AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusCard),
         border: Border.all(
           color: pendingCount > 0
-              ? AppTheme.success.withOpacity(0.3)
-              : Colors.white.withOpacity(0.08),
+              ? AppTheme.warning.withOpacity(0.3)
+              : AppTheme.cardBorder,
+          width: 0.5,
         ),
+        boxShadow: pendingCount > 0 
+          ? [BoxShadow(color: AppTheme.primary.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 6))] 
+          : AppTheme.softShadow,
       ),
       child: Row(children: [
         Container(
@@ -182,13 +182,13 @@ class _PendingHighlightCard extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-          const Text('ĐƠN VÉ CHỜ DUYỆT', style: TextStyle(
-              fontSize: 11, color: Colors.white54,
+          Text('ĐƠN VÉ CHỜ DUYỆT', style: TextStyle(
+              fontSize: 11, color: pendingCount > 0 ? Colors.white54 : AppTheme.textHint,
               fontWeight: FontWeight.w700, letterSpacing: 1.2)),
           const SizedBox(height: 4),
           Text('$pendingCount đơn',
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900,
-                  color: pendingCount > 0 ? AppTheme.warning : Colors.white)),
+                  color: pendingCount > 0 ? AppTheme.warning : AppTheme.textPrimary)),
           if (pendingCount > 0)
             const Text('Cần xử lý ngay!',
                 style: TextStyle(fontSize: 12, color: AppTheme.warning)),
@@ -213,12 +213,13 @@ class _StatCard extends StatelessWidget {
       duration: const Duration(milliseconds: 300),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: highlight ? color.withOpacity(0.12) : AppTheme.cardColor,
+        color: highlight ? color.withOpacity(0.12) : AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusCard),
         border: Border.all(
           color: highlight ? color.withOpacity(0.4) : AppTheme.cardBorder,
-          width: highlight ? 1.5 : 1,
+          width: highlight ? 1.5 : 0.5,
         ),
+        boxShadow: highlight ? null : AppTheme.softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

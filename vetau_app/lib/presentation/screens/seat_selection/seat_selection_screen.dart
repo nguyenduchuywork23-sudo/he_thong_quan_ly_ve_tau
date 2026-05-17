@@ -347,8 +347,8 @@ class _SeatWidget extends StatelessWidget {
           height: 45,
           decoration: BoxDecoration(
             color: bgColor,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: borderColor, width: 1.0),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: borderColor, width: 1.5),
           ),
           child: Center(
             child: Text(
@@ -395,9 +395,9 @@ class _LegendItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(children: [
-      Container(width: 18, height: 18,
-        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: border))),
+      Container(width: 20, height: 20,
+        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: border, width: 1.5))),
       const SizedBox(width: 4),
       Text(label, style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
     ]);
@@ -423,8 +423,7 @@ class _BottomPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         border: const Border(top: BorderSide(color: AppTheme.cardBorder)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2),
-            blurRadius: 12, offset: const Offset(0, -4))],
+        boxShadow: AppTheme.softShadow,
       ),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         if (tp.selectedSeat == null)

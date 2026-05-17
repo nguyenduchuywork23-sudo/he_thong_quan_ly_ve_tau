@@ -37,7 +37,7 @@ class _StaffPendingScreenState extends State<StaffPendingScreen> {
     final confirmed = await showDialog<bool>(
       context: ctx,
       builder: (_) => AlertDialog(
-        backgroundColor: AppTheme.cardColor,
+        backgroundColor: AppTheme.surface,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
             side: const BorderSide(color: AppTheme.cardBorder)),
@@ -133,7 +133,7 @@ class _StaffPendingScreenState extends State<StaffPendingScreen> {
 
       return RefreshIndicator(
         color: AppTheme.success,
-        backgroundColor: AppTheme.cardColor,
+        backgroundColor: AppTheme.surface,
         onRefresh: () => sp.loadPendingBookings(force: true),
         child: ListView.builder(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 80),
@@ -153,10 +153,12 @@ class _StaffPendingScreenState extends State<StaffPendingScreen> {
             return Container(
               margin: const EdgeInsets.symmetric(vertical: 5),
               decoration: BoxDecoration(
-                color: AppTheme.cardColor,
+                color: AppTheme.surface,
                 borderRadius: BorderRadius.circular(AppTheme.radiusCard),
                 border: Border.all(
-                    color: AppTheme.warning.withOpacity(0.3)),
+                    color: AppTheme.warning.withOpacity(0.4),
+                    width: 0.5),
+                boxShadow: AppTheme.softShadow,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(14),

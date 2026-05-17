@@ -1,4 +1,4 @@
-/// TripCard – Card hiển thị 1 chuyến tàu trong kết quả tìm kiếm
+/// TripCard – Card hiển thị 1 chuyến tàu trong kết quả tìm kiếm (Ocean Theme)
 library;
 
 import 'package:flutter/material.dart';
@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import '../../data/models/trip_model.dart';
 import '../../core/theme/app_theme.dart';
 
-class TripCard extends StatelessWidget {
+class TripCard extends StatefulWidget {
   final TripSearchResult trip;
   final VoidCallback onSelect;
 
@@ -17,187 +17,238 @@ class TripCard extends StatelessWidget {
   });
 
   @override
+  State<TripCard> createState() => _TripCardState();
+}
+
+class _TripCardState extends State<TripCard> {
+  // Fade-in khi card mới xuất hiện
+  double _opacity = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted) setState(() => _opacity = 1.0);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final priceFormat = NumberFormat.currency(
       locale: 'vi_VN', symbol: '₫', decimalDigits: 0,
     );
 
-    return Container(
-      margin: const EdgeInsets.symmetric(
-          horizontal: AppTheme.spacingM, vertical: AppTheme.spacingS),
-      decoration: BoxDecoration(
-        gradient: AppTheme.cardGradient,
-        borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-        border: Border.all(color: AppTheme.cardBorder),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onSelect,
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOut,
+      opacity: _opacity,
+      child: Container(
+        margin: const EdgeInsets.symmetric(
+            horizontal: AppTheme.spacingM, vertical: AppTheme.spacingS),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-          child: Padding(
-            padding: const EdgeInsets.all(AppTheme.spacingM),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Row 1: Tên tàu + Loại tàu badge ──────────
-                Row(
-                  children: [
-                    const Icon(Icons.train, color: AppTheme.primary, size: 18),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        trip.trainName,
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppTheme.textPrimary,
+          boxShadow: AppTheme.softShadow,
+          border: Border.all(color: AppTheme.cardBorder, width: 0.5),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.onSelect,
+            borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+            splashColor: AppTheme.primaryLight.withOpacity(0.2),
+            highlightColor: AppTheme.primaryLight.withOpacity(0.1),
+            child: Padding(
+              padding: const EdgeInsets.all(AppTheme.spacingM),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Row 1: Tên tàu + Loại tàu badge ──────────
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        overflow: TextOverflow.ellipsis,
+                        child: const Icon(Icons.train, color: AppTheme.primary, size: 16),
                       ),
-                    ),
-                    _TrainTypeBadge(trainName: trip.trainName),
-                  ],
-                ),
-
-                const SizedBox(height: AppTheme.spacingM),
-
-                // ── Row 2: Giờ đi ─── Duration ─── Giờ đến ───
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Giờ đi
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          trip.departureTime,
-                          style: const TextStyle(
-                            fontSize: 26, fontWeight: FontWeight.w800,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          widget.trip.trainName,
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             color: AppTheme.textPrimary,
-                          ),
-                        ),
-                        Text(
-                          trip.fromStation,
-                          style: const TextStyle(
-                            fontSize: 12, color: AppTheme.textSecondary,
+                            fontWeight: FontWeight.w800,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
-                      ],
-                    ),
+                      ),
+                      _TrainTypeBadge(trainName: widget.trip.trainName),
+                    ],
+                  ),
 
-                    // Duration line
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                  const SizedBox(height: AppTheme.spacingM),
+
+                  // ── Row 2: Giờ đi ─── Duration ─── Giờ đến ───
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Giờ đi
+                      Expanded(
+                        flex: 3,
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              trip.durationFormatted,
+                              widget.trip.departureTime,
                               style: const TextStyle(
-                                fontSize: 11, color: AppTheme.textHint,
+                                fontSize: 24, fontWeight: FontWeight.w900,
+                                color: AppTheme.primaryDark,
                               ),
-                              textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Container(width: 6, height: 6,
-                                    decoration: const BoxDecoration(
-                                        color: AppTheme.primary,
-                                        shape: BoxShape.circle)),
-                                Expanded(
-                                  child: Container(height: 1.5,
-                                      color: AppTheme.cardBorder),
-                                ),
-                                const Icon(Icons.arrow_forward,
-                                    color: AppTheme.primary, size: 14),
-                              ],
+                            Text(
+                              widget.trip.fromStation,
+                              style: const TextStyle(
+                                fontSize: 12, color: AppTheme.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
                       ),
-                    ),
 
-                    // Giờ đến
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          trip.arrivalTime,
-                          style: const TextStyle(
-                            fontSize: 26, fontWeight: FontWeight.w800,
-                            color: AppTheme.textPrimary,
+                      // Duration line
+                      Expanded(
+                        flex: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Column(
+                            children: [
+                              Text(
+                                widget.trip.durationFormatted,
+                                style: const TextStyle(
+                                  fontSize: 11, color: AppTheme.textHint,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Container(width: 6, height: 6,
+                                      decoration: BoxDecoration(
+                                          border: Border.all(color: AppTheme.primary, width: 2),
+                                          shape: BoxShape.circle)),
+                                  Expanded(
+                                    child: Container(height: 1,
+                                        color: AppTheme.primaryLight.withOpacity(0.5)),
+                                  ),
+                                  const Icon(Icons.arrow_forward_ios,
+                                      color: AppTheme.primary, size: 10),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                        Text(
-                          trip.toStation,
-                          style: const TextStyle(
-                            fontSize: 12, color: AppTheme.textSecondary,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: AppTheme.spacingM),
-                const Divider(height: 1),
-                const SizedBox(height: AppTheme.spacingM),
-
-                // ── Row 3: Khoảng cách + Giá + Nút Chọn ──────
-                Row(
-                  children: [
-                    // Distance & Route
-                    Expanded(
-                      child: Wrap(
-                        spacing: 8,
-                        runSpacing: 4,
-                        children: [
-                          _InfoChip(
-                            icon: Icons.straighten,
-                            label: '${trip.distance.toStringAsFixed(0)} km',
-                          ),
-                          _InfoChip(
-                            icon: Icons.route,
-                            label: trip.routeName,
-                          ),
-                        ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Giá từ
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text('Từ',
-                              style: TextStyle(
-                                  fontSize: 11, color: AppTheme.textHint)),
-                          Text(
-                            priceFormat.format(trip.basePrice),
-                            style: const TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.w800,
-                              color: AppTheme.primary,
+
+                      // Giờ đến
+                      Expanded(
+                        flex: 3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              widget.trip.arrivalTime,
+                              style: const TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.w900,
+                                color: AppTheme.textPrimary,
+                              ),
                             ),
+                            Text(
+                              widget.trip.toStation,
+                              style: const TextStyle(
+                                fontSize: 12, color: AppTheme.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.right,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: AppTheme.spacingM),
+                  Container(
+                    height: 1,
+                    color: AppTheme.cardBorder,
+                  ),
+                  const SizedBox(height: AppTheme.spacingM),
+
+                  // ── Row 3: Khoảng cách + Giá + Nút Chọn ──────
+                  Row(
+                    children: [
+                      // Distance & Route
+                      Expanded(
+                        child: Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: [
+                            _InfoChip(
+                              icon: Icons.straighten,
+                              label: '${widget.trip.distance.toStringAsFixed(0)} km',
+                            ),
+                            _InfoChip(
+                              icon: Icons.route,
+                              label: widget.trip.routeName,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Giá từ
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            const Text('Giá chỉ từ',
+                                style: TextStyle(
+                                    fontSize: 10, color: AppTheme.textHint,
+                                    fontWeight: FontWeight.w600)),
+                            Text(
+                              priceFormat.format(widget.trip.basePrice),
+                              style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w900,
+                                color: AppTheme.error, // Dùng màu nhấn đỏ/cam cho giá tiền
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Nút chọn
+                      ElevatedButton(
+                        onPressed: widget.onSelect,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(80, 40),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          elevation: 0, // Đã có bóng ở container
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ],
+                        ),
+                        child: const Text('Chọn', style: TextStyle(fontSize: 14)),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Nút chọn
-                    ElevatedButton(
-                      onPressed: onSelect,
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(80, 36),
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                      ),
-                      child: const Text('Chọn'),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -217,21 +268,21 @@ class _TrainTypeBadge extends StatelessWidget {
     // SE = express, SPT = local
     final isExpress = trainName.toUpperCase().startsWith('SE');
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: isExpress
-            ? AppTheme.primary.withOpacity(0.15)
-            : AppTheme.cardColor,
-        borderRadius: BorderRadius.circular(20),
+            ? AppTheme.info.withOpacity(0.1)
+            : AppTheme.background,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isExpress ? AppTheme.primary : AppTheme.cardBorder,
+          color: isExpress ? AppTheme.info.withOpacity(0.3) : AppTheme.cardBorder,
         ),
       ),
       child: Text(
-        isExpress ? '⚡ Nhanh' : 'Thường',
+        isExpress ? '⚡ Tốc hành' : 'Thường',
         style: TextStyle(
           fontSize: 10, fontWeight: FontWeight.w700,
-          color: isExpress ? AppTheme.primary : AppTheme.textSecondary,
+          color: isExpress ? AppTheme.info : AppTheme.textSecondary,
         ),
       ),
     );
@@ -243,28 +294,29 @@ class _TrainTypeBadge extends StatelessWidget {
 class _InfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
-  final double? maxWidth;
-  const _InfoChip({required this.icon, required this.label, this.maxWidth});
+  const _InfoChip({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(maxWidth: maxWidth ?? double.infinity),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppTheme.cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.cardBorder),
+        color: AppTheme.background,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppTheme.cardBorder, width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 11, color: AppTheme.textHint),
+          Icon(icon, size: 12, color: AppTheme.textHint),
           const SizedBox(width: 4),
           Flexible(
             child: Text(
               label,
-              style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+              style: const TextStyle(
+                fontSize: 11, color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),

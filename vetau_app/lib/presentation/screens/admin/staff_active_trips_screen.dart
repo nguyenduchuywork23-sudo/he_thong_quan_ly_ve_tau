@@ -64,7 +64,7 @@ class _StaffActiveTripsScreenState extends State<StaffActiveTripsScreen> {
 
       return RefreshIndicator(
         color: AppTheme.success,
-        backgroundColor: AppTheme.cardColor,
+        backgroundColor: AppTheme.surface,
         onRefresh: () => sp.loadActiveTrips(force: true),
         child: ListView.builder(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 80),
@@ -74,9 +74,10 @@ class _StaffActiveTripsScreenState extends State<StaffActiveTripsScreen> {
             return Container(
               margin: const EdgeInsets.symmetric(vertical: 5),
               decoration: BoxDecoration(
-                color: AppTheme.cardColor,
+                color: AppTheme.surface,
                 borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-                border: Border.all(color: AppTheme.cardBorder),
+                border: Border.all(color: AppTheme.cardBorder, width: 0.5),
+                boxShadow: AppTheme.softShadow,
               ),
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(

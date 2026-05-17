@@ -27,7 +27,7 @@ class _AdminTrainsScreenState extends State<AdminTrainsScreen> {
     return Consumer<AdminProvider>(builder: (ctx, ap, _) {
       return RefreshIndicator(
         color: AppTheme.primary,
-        backgroundColor: AppTheme.cardColor,
+        backgroundColor: AppTheme.surface,
         onRefresh: () => ap.loadTrains(force: true),
         child: _buildBody(ap),
       );
@@ -121,9 +121,10 @@ class _TrainCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
-        color: AppTheme.cardColor,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-        border: Border.all(color: AppTheme.cardBorder),
+        border: Border.all(color: AppTheme.cardBorder, width: 0.5),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Column(children: [
         // Header
@@ -133,7 +134,7 @@ class _TrainCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: isActive
                 ? const Color(0xFF1A1F4E).withOpacity(0.6)
-                : AppTheme.cardColor,
+                : Colors.transparent,
             borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(AppTheme.radiusCard)),
             border: const Border(

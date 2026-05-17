@@ -63,7 +63,7 @@ class _AdminStationsScreenState extends State<AdminStationsScreen> {
     final confirm = await showDialog<bool>(
       context: ctx,
       builder: (_) => AlertDialog(
-        backgroundColor: AppTheme.cardColor,
+        backgroundColor: AppTheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: AppTheme.cardBorder)),
@@ -168,7 +168,7 @@ class _AdminStationsScreenState extends State<AdminStationsScreen> {
 
     return RefreshIndicator(
       color: AppTheme.primary,
-      backgroundColor: AppTheme.cardColor,
+      backgroundColor: AppTheme.surface,
       onRefresh: () => ap.loadStations(force: true),
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 80),
@@ -197,9 +197,10 @@ class _StationTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
-        color: AppTheme.cardColor,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-        border: Border.all(color: AppTheme.cardBorder),
+        border: Border.all(color: AppTheme.cardBorder, width: 0.5),
+        boxShadow: AppTheme.softShadow,
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
@@ -419,9 +420,9 @@ class _StationFormSheetState extends State<_StationFormSheet> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: AppTheme.cardColor,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppTheme.cardBorder),
+            border: Border.all(color: AppTheme.cardBorder, width: 0.5),
           ),
           child: Row(children: [
             const Icon(Icons.toggle_on_outlined,

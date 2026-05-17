@@ -1,12 +1,4 @@
-/// App Theme – Design System chuẩn Mobile
-///
-/// Màu sắc:
-///   Primary  : #E8470A (đỏ cam đặc trưng vé tàu Việt Nam)
-///   Background: #0F1124 (navy tối)
-///   Surface  : #1A1D2E
-///   Card     : #252840
-///
-/// Font: Nunito Sans (Google Fonts)
+/// App Theme – Design System chuẩn Mobile (Soft Blue / Ocean Theme)
 library;
 
 import 'package:flutter/material.dart';
@@ -15,54 +7,54 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   AppTheme._();
 
-  // ─── Màu sắc ─────────────────────────────────
-  static const Color primary = Color(0xFFE8470A);
-  static const Color primaryLight = Color(0xFFFF6B35);
-  static const Color primaryDark = Color(0xFFBF3608);
+  // ─── Màu sắc (Soft Blue Palette) ────────────────
+  static const Color primary = Color(0xFF2196F3);       // Blue 500
+  static const Color primaryLight = Color(0xFF64B5F6);  // Blue 300
+  static const Color primaryDark = Color(0xFF1976D2);   // Blue 700
 
-  static const Color background = Color(0xFF0F1124);
-  static const Color surface = Color(0xFF1A1D2E);
-  static const Color cardColor = Color(0xFF252840);
-  static const Color cardBorder = Color(0xFF343759);
+  static const Color background = Color(0xFFF3F8FF);    // Xanh lam cực nhạt
+  static const Color surface = Color(0xFFFFFFFF);       // Trắng tinh
+  static const Color cardColor = Color(0xFFFFFFFF);     // Trắng tinh
+  static const Color cardBorder = Color(0xFFE2E8F0);    // Slate 200
 
-  static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFF9CA3AF);
-  static const Color textHint = Color(0xFF6B7280);
+  static const Color textPrimary = Color(0xFF1A237E);   // Xanh đen đậm (Indigo 900)
+  static const Color textSecondary = Color(0xFF64748B); // Slate 500
+  static const Color textHint = Color(0xFF94A3B8);      // Slate 400
 
-  static const Color success = Color(0xFF22C55E);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color error = Color(0xFFEF4444);
-  static const Color info = Color(0xFF3B82F6);
+  static const Color success = Color(0xFF10B981);       // Emerald 500
+  static const Color warning = Color(0xFFF59E0B);       // Amber 500
+  static const Color error = Color(0xFFEF4444);         // Red 500
+  static const Color info = Color(0xFF3B82F6);          // Blue 500
 
-  static const Color seatAvailable = Color(0xFF22C55E);
-  static const Color seatSelected = Color(0xFFE8470A);
-  static const Color seatBooked = Color(0xFF4B5563);
-  static const Color seatLocked = Color(0xFF6B7280);
+  static const Color seatAvailable = Color(0xFF10B981);
+  static const Color seatSelected = Color(0xFF2196F3);
+  static const Color seatBooked = Color(0xFFCBD5E1);
+  static const Color seatLocked = Color(0xFF94A3B8);
 
   // ─── Gradient ─────────────────────────────────
   static const LinearGradient heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF0F1124), Color(0xFF1E2140), Color(0xFF0F1124)],
+    colors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB), Color(0xFFE3F2FD)], // Soft blue hero
   );
 
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [primary, primaryLight],
+    colors: [primaryLight, primary],
   );
 
   static const LinearGradient cardGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF2A2E4A), Color(0xFF1E2140)],
+    colors: [Color(0xFFFFFFFF), Color(0xFFF8FAFC)],
   );
 
   // ─── Border Radius ────────────────────────────
-  static const double radiusCard = 16.0;
-  static const double radiusButton = 14.0;
-  static const double radiusInput = 12.0;
-  static const double radiusSmall = 8.0;
+  static const double radiusCard = 20.0;
+  static const double radiusButton = 16.0;
+  static const double radiusInput = 16.0;
+  static const double radiusSmall = 10.0;
 
   // ─── Spacing ──────────────────────────────────
   static const double spacingXS = 4.0;
@@ -71,13 +63,22 @@ class AppTheme {
   static const double spacingL = 24.0;
   static const double spacingXL = 32.0;
 
+  // ─── Shadow (Soft Drop Shadow) ────────────────
+  static List<BoxShadow> get softShadow => [
+        BoxShadow(
+          color: const Color(0xFF1A237E).withOpacity(0.06),
+          blurRadius: 16,
+          offset: const Offset(0, 8),
+        ),
+      ];
+
   // ─── ThemeData ────────────────────────────────
-  static ThemeData get darkTheme {
-    final base = ThemeData.dark(useMaterial3: true);
+  static ThemeData get lightTheme {
+    final base = ThemeData.light(useMaterial3: true);
 
     return base.copyWith(
       scaffoldBackgroundColor: background,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: const ColorScheme.light(
         primary: primary,
         onPrimary: Colors.white,
         secondary: primaryLight,
@@ -121,6 +122,8 @@ class AppTheme {
         backgroundColor: surface,
         elevation: 0,
         centerTitle: true,
+        surfaceTintColor: Colors.transparent, // Ngăn Material 3 tự đổi màu
+        shadowColor: const Color(0xFF1A237E).withOpacity(0.05),
         titleTextStyle: GoogleFonts.nunitoSans(
           fontSize: 18, fontWeight: FontWeight.w700, color: textPrimary,
         ),
@@ -141,7 +144,8 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: Colors.white,
-          elevation: 0,
+          elevation: 2,
+          shadowColor: primary.withOpacity(0.5),
           minimumSize: const Size(double.infinity, 56),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusButton),
@@ -155,7 +159,8 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: primary,
-          side: const BorderSide(color: primary, width: 1.5),
+          backgroundColor: surface,
+          side: const BorderSide(color: primaryLight, width: 1.5),
           minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusButton),
@@ -194,13 +199,14 @@ class AppTheme {
       // ── BottomSheet ──
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: surface,
+        elevation: 10,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
       ),
       // ── Chip ──
       chipTheme: ChipThemeData(
-        backgroundColor: cardColor,
+        backgroundColor: background,
         labelStyle: GoogleFonts.nunitoSans(fontSize: 12, color: textSecondary),
         side: const BorderSide(color: cardBorder),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

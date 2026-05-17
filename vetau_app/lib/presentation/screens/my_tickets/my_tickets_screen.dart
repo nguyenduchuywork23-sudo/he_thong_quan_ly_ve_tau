@@ -128,9 +128,10 @@ class _TicketCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(
             horizontal: AppTheme.spacingM, vertical: 6),
         decoration: BoxDecoration(
-          gradient: AppTheme.cardGradient,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-          border: Border.all(color: AppTheme.cardBorder),
+          border: Border.all(color: AppTheme.cardBorder, width: 0.5),
+          boxShadow: AppTheme.softShadow,
         ),
         child: Column(children: [
           // ── Header: mã đặt chỗ ──────────────

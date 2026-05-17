@@ -152,7 +152,7 @@ class VetauApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Vé Tàu – Đặt vé tàu nhanh',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
       routerConfig: _router,
 
       // SEO / Accessibility

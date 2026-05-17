@@ -89,10 +89,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft, end: Alignment.bottomRight,
-              colors: [AppTheme.surface, Color(0xFF1E2140)],
-            ),
+            gradient: AppTheme.heroGradient,
           ),
           child: SafeArea(
             child: Padding(
@@ -332,13 +329,14 @@ class _ShimmerCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: AppTheme.spacingM, vertical: AppTheme.spacingS),
       child: Shimmer.fromColors(
-        baseColor: AppTheme.cardColor,
-        highlightColor: AppTheme.surface,
+        baseColor: Colors.grey[200]!,
+        highlightColor: Colors.grey[100]!,
         child: Container(
           height: 150,
           decoration: BoxDecoration(
-            color: AppTheme.cardColor,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+            border: Border.all(color: AppTheme.cardBorder, width: 0.5),
           ),
         ),
       ),

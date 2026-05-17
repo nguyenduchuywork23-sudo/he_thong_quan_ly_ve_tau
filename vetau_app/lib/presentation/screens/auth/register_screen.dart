@@ -110,167 +110,181 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: AppTheme.background,
       body: Stack(children: [
         Container(decoration: const BoxDecoration(gradient: AppTheme.heroGradient)),
-        Positioned(top: -60, right: -60,
-          child: Container(width: 200, height: 200,
-            decoration: BoxDecoration(shape: BoxShape.circle,
-                color: AppTheme.primary.withOpacity(0.08)))),
         SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppTheme.spacingM),
-            child: Consumer<AuthProvider>(
-              builder: (_, auth, __) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 12),
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: const Icon(Icons.arrow_back_ios,
-                        color: AppTheme.textSecondary, size: 20),
-                    padding: EdgeInsets.zero,
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppTheme.spacingM),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 450),
+                child: Container(
+                  padding: const EdgeInsets.all(AppTheme.spacingXL),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                    boxShadow: AppTheme.softShadow,
+                    border: Border.all(color: AppTheme.cardBorder, width: 0.5),
                   ),
-                  const SizedBox(height: 28),
+                  child: Consumer<AuthProvider>(
+                    builder: (_, auth, __) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () => context.pop(),
+                              icon: const Icon(Icons.arrow_back_ios,
+                                  color: AppTheme.textSecondary, size: 20),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                            const Spacer(),
+                            // Logo
+                            Container(width: 40, height: 40,
+                              decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: const Icon(Icons.train, color: AppTheme.primary, size: 22)),
+                          ],
+                        ),
 
-                  const Text('Tạo tài khoản', style: TextStyle(fontSize: 28,
-                      fontWeight: FontWeight.w800, color: AppTheme.textPrimary)),
-                  const SizedBox(height: 6),
-                  const Text('Tham gia cùng chúng tôi ngay hôm nay!',
-                      style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
-                  const SizedBox(height: 32),
+                        const SizedBox(height: 24),
+                        const Text('Tạo tài khoản', style: TextStyle(fontSize: 28,
+                            fontWeight: FontWeight.w800, color: AppTheme.textPrimary)),
+                        const SizedBox(height: 6),
+                        const Text('Tham gia cùng chúng tôi ngay hôm nay!',
+                            style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
+                        const SizedBox(height: 32),
 
-                  // Full Name
-                  const _Label('Họ và tên'),
-                  const SizedBox(height: 6),
-                  TextFormField(
-                    controller: _fullNameCtrl,
-                    textInputAction: TextInputAction.next,
-                    style: const TextStyle(color: AppTheme.textPrimary),
-                    onChanged: (_) => setState(() {}),
-                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
-                    decoration: InputDecoration(
-                      hintText: 'Nguyễn Văn A',
-                      prefixIcon: const Icon(Icons.person_outline,
-                          color: AppTheme.textHint, size: 20),
-                      errorText: _fullNameErr,
+                        // Full Name
+                        const _Label('Họ và tên'),
+                        const SizedBox(height: 6),
+                        TextFormField(
+                          controller: _fullNameCtrl,
+                          textInputAction: TextInputAction.next,
+                          style: const TextStyle(color: AppTheme.textPrimary),
+                          onChanged: (_) => setState(() {}),
+                          onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
+                          decoration: InputDecoration(
+                            hintText: 'Nguyễn Văn A',
+                            prefixIcon: const Icon(Icons.person_outline,
+                                color: AppTheme.textHint, size: 20),
+                            errorText: _fullNameErr,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Email
+                        const _Label('Email'),
+                        const SizedBox(height: 6),
+                        TextFormField(
+                          controller: _emailCtrl,
+                          focusNode: _emailFocus,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          style: const TextStyle(color: AppTheme.textPrimary),
+                          onChanged: (_) => setState(() {}),
+                          onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_passFocus),
+                          decoration: InputDecoration(
+                            hintText: 'example@email.com',
+                            prefixIcon: const Icon(Icons.email_outlined,
+                                color: AppTheme.textHint, size: 20),
+                            errorText: _emailErr,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Password
+                        const _Label('Mật khẩu'),
+                        const SizedBox(height: 6),
+                        TextFormField(
+                          controller: _passCtrl,
+                          focusNode: _passFocus,
+                          obscureText: _obscurePass,
+                          textInputAction: TextInputAction.next,
+                          style: const TextStyle(color: AppTheme.textPrimary),
+                          onChanged: (_) => setState(() {}),
+                          onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmPassFocus),
+                          decoration: InputDecoration(
+                            hintText: '••••••••',
+                            prefixIcon: const Icon(Icons.lock_outline,
+                                color: AppTheme.textHint, size: 20),
+                            errorText: _passErr,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePass ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                color: AppTheme.textHint, size: 20),
+                              onPressed: () => setState(() => _obscurePass = !_obscurePass),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Confirm Password
+                        const _Label('Xác nhận mật khẩu'),
+                        const SizedBox(height: 6),
+                        TextFormField(
+                          controller: _confirmPassCtrl,
+                          focusNode: _confirmPassFocus,
+                          obscureText: _obscureConfirmPass,
+                          textInputAction: TextInputAction.done,
+                          style: const TextStyle(color: AppTheme.textPrimary),
+                          onChanged: (_) => setState(() {}),
+                          onFieldSubmitted: (_) => _submit(),
+                          decoration: InputDecoration(
+                            hintText: '••••••••',
+                            prefixIcon: const Icon(Icons.lock_outline,
+                                color: AppTheme.textHint, size: 20),
+                            errorText: _confirmPassErr,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureConfirmPass ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                color: AppTheme.textHint, size: 20),
+                              onPressed: () => setState(() => _obscureConfirmPass = !_obscureConfirmPass),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // Submit button
+                        ElevatedButton(
+                          onPressed: auth.isLoading ? null : _submit,
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 56),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppTheme.radiusButton),
+                            ),
+                          ),
+                          child: auth.isLoading
+                              ? const SizedBox(width: 22, height: 22,
+                                  child: CircularProgressIndicator(
+                                      color: Colors.white, strokeWidth: 2.5))
+                              : const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.person_add, size: 20),
+                                    SizedBox(width: 8),
+                                    Text('Đăng ký', style: TextStyle(
+                                        fontSize: 16, fontWeight: FontWeight.w700)),
+                                  ]),
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Đã có tài khoản?', style: TextStyle(color: AppTheme.textSecondary)),
+                            TextButton(
+                              onPressed: () => context.pop(),
+                              child: const Text('Đăng nhập ngay', style: TextStyle(
+                                  color: AppTheme.primary, fontWeight: FontWeight.w700)),
+                            )
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 14),
-
-                  // Email
-                  const _Label('Email'),
-                  const SizedBox(height: 6),
-                  TextFormField(
-                    controller: _emailCtrl,
-                    focusNode: _emailFocus,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    style: const TextStyle(color: AppTheme.textPrimary),
-                    onChanged: (_) => setState(() {}),
-                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_passFocus),
-                    decoration: InputDecoration(
-                      hintText: 'example@email.com',
-                      prefixIcon: const Icon(Icons.email_outlined,
-                          color: AppTheme.textHint, size: 20),
-                      errorText: _emailErr,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  // Password
-                  const _Label('Mật khẩu'),
-                  const SizedBox(height: 6),
-                  TextFormField(
-                    controller: _passCtrl,
-                    focusNode: _passFocus,
-                    obscureText: _obscurePass,
-                    textInputAction: TextInputAction.next,
-                    style: const TextStyle(color: AppTheme.textPrimary),
-                    onChanged: (_) => setState(() {}),
-                    onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmPassFocus),
-                    decoration: InputDecoration(
-                      hintText: '••••••••',
-                      prefixIcon: const Icon(Icons.lock_outline,
-                          color: AppTheme.textHint, size: 20),
-                      errorText: _passErr,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePass ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                          color: AppTheme.textHint, size: 20),
-                        onPressed: () => setState(() => _obscurePass = !_obscurePass),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  // Confirm Password
-                  const _Label('Xác nhận mật khẩu'),
-                  const SizedBox(height: 6),
-                  TextFormField(
-                    controller: _confirmPassCtrl,
-                    focusNode: _confirmPassFocus,
-                    obscureText: _obscureConfirmPass,
-                    textInputAction: TextInputAction.done,
-                    style: const TextStyle(color: AppTheme.textPrimary),
-                    onChanged: (_) => setState(() {}),
-                    onFieldSubmitted: (_) => _submit(),
-                    decoration: InputDecoration(
-                      hintText: '••••••••',
-                      prefixIcon: const Icon(Icons.lock_outline,
-                          color: AppTheme.textHint, size: 20),
-                      errorText: _confirmPassErr,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureConfirmPass ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                          color: AppTheme.textHint, size: 20),
-                        onPressed: () => setState(() => _obscureConfirmPass = !_obscureConfirmPass),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-
-                  // Submit button
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: AppTheme.primaryGradient,
-                      borderRadius: BorderRadius.circular(AppTheme.radiusButton),
-                      boxShadow: [BoxShadow(color: AppTheme.primary.withOpacity(0.35),
-                          blurRadius: 16, offset: const Offset(0, 6))],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: auth.isLoading ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        minimumSize: const Size(double.infinity, 56),
-                      ),
-                      child: auth.isLoading
-                          ? const SizedBox(width: 22, height: 22,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2.5))
-                          : const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.person_add, size: 20),
-                                SizedBox(width: 8),
-                                Text('Đăng ký', style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w700)),
-                              ]),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Đã có tài khoản?', style: TextStyle(color: AppTheme.textSecondary)),
-                      TextButton(
-                        onPressed: () => context.pop(),
-                        child: const Text('Đăng nhập ngay', style: TextStyle(
-                            color: AppTheme.primary, fontWeight: FontWeight.w700)),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                ],
+                ),
               ),
             ),
           ),

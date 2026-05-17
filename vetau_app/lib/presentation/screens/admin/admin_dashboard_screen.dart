@@ -168,13 +168,10 @@ class _RevenueCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft, end: Alignment.bottomRight,
-          colors: [Color(0xFF1A1F4E), Color(0xFF2D3494)],
-        ),
+        gradient: AppTheme.primaryGradient,
         borderRadius: BorderRadius.circular(AppTheme.radiusCard),
         border: Border.all(color: Colors.white.withOpacity(0.08)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3),
+        boxShadow: [BoxShadow(color: AppTheme.primary.withOpacity(0.3),
             blurRadius: 16, offset: const Offset(0, 6))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -238,12 +235,13 @@ class _StatCard extends StatelessWidget {
       duration: const Duration(milliseconds: 300),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: highlight ? color.withOpacity(0.12) : AppTheme.cardColor,
+        color: highlight ? color.withOpacity(0.12) : AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusCard),
         border: Border.all(
           color: highlight ? color.withOpacity(0.4) : AppTheme.cardBorder,
-          width: highlight ? 1.5 : 1,
+          width: highlight ? 1.5 : 0.5,
         ),
+        boxShadow: highlight ? null : AppTheme.softShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

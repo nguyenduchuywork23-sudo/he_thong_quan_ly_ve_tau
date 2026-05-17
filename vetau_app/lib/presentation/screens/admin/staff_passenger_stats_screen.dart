@@ -62,7 +62,7 @@ class _StaffPassengerStatsScreenState
 
       return RefreshIndicator(
         color: AppTheme.success,
-        backgroundColor: AppTheme.cardColor,
+        backgroundColor: AppTheme.surface,
         onRefresh: () => sp.loadPassengerStats(force: true),
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -98,9 +98,10 @@ class _StaffPassengerStatsScreenState
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.cardColor,
+                color: AppTheme.surface,
                 borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-                border: Border.all(color: AppTheme.cardBorder),
+                border: Border.all(color: AppTheme.cardBorder, width: 0.5),
+                boxShadow: AppTheme.softShadow,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
