@@ -27,12 +27,10 @@ class BookingService {
   ) async {
     try {
       final requestData = request.toJson();
-      requestData['sessionId'] = sessionId;
 
       final response = await _dio.post(
         ApiConstants.createBooking,
         data: requestData,
-        options: Options(headers: {'X-Session-Id': sessionId}),
       );
 
       return CreateBookingResponse.fromJson(

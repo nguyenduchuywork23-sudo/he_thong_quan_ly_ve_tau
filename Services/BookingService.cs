@@ -11,7 +11,7 @@ namespace VetauBackend.Services
     public interface IBookingService
     {
         Task<Booking?> CreateBookingAsync(CreateBookingRequest req, string sessionId, int? userId);
-        Task<List<Booking>> GetMyBookingsAsync(int userId);
+        Task<object> GetMyBookingsAsync(int userId);
     }
 
     public class BookingService : IBookingService
@@ -91,12 +91,53 @@ namespace VetauBackend.Services
             return booking;
         }
 
-        public async Task<List<Booking>> GetMyBookingsAsync(int userId)
+        public async Task<object> GetMyBookingsAsync(int userId)
         {
-            return await _context.Bookings
+            var bookings = await _context.Bookings
+                .Include(b => b.Trip).ThenInclude(t => t.Train)
+                .Include(b => b.FromStation)
+                .Include(b => b.ToStation)
+                .Include(b => b.Seat)
+                .Include(b => b.Carriage)
                 .Where(b => b.UserId == userId)
                 .OrderByDescending(b => b.CreatedAt)
                 .ToListAsync();
+
+            return bookings.Select(b => new
+            {
+                b.Id,
+                b.BookingCode,
+                b.PassengerName,
+                b.PassengerIdCard,
+                b.PassengerPhone,
+                b.PassengerEmail,
+                b.PassengerType,
+                b.PaymentMethod,
+                b.Status,
+                b.BasePrice,
+                b.DiscountPercent,
+                b.DiscountAmount,
+                b.FinalPrice,
+                b.CreatedAt,
+                b.UpdatedAt,
+                b.PaymentDeadline,
+                b.PaidAt,
+                b.QrCodeData,
+                b.UserId,
+                b.TripId,
+                b.FromStationId,
+                b.ToStationId,
+                b.SeatId,
+                b.CarriageId,
+                TrainName = b.Trip?.Train?.Name ?? "",
+                FromStation = b.FromStation?.Name ?? "",
+                ToStation = b.ToStation?.Name ?? "",
+                DepartureTime = b.Trip?.DepartureTime ?? "",
+                ArrivalTime = b.Trip?.ArrivalTime ?? "",
+                DepartureDate = b.Trip?.DepartureDate.ToString("yyyy-MM-dd") ?? "",
+                SeatNumber = b.Seat?.SeatNumber ?? "",
+                CarriageType = b.Carriage?.CarriageType ?? ""
+            }).ToList();
         }
     }
 }

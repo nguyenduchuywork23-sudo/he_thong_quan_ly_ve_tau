@@ -62,20 +62,28 @@ class PassengerStats {
 class ActiveTrip {
   final int id;
   final String trainName;
+  final String trainCode;
+  final String routeName;
   final String fromStation;
   final String toStation;
   final String departureTime;
   final String arrivalTime;
+  final String? departureDate;
+  final int durationMinutes;
   final String status;
   final int passengerCount;
 
   const ActiveTrip({
     required this.id,
     required this.trainName,
+    required this.trainCode,
+    required this.routeName,
     required this.fromStation,
     required this.toStation,
     required this.departureTime,
     required this.arrivalTime,
+    this.departureDate,
+    required this.durationMinutes,
     required this.status,
     required this.passengerCount,
   });
@@ -84,10 +92,14 @@ class ActiveTrip {
     return ActiveTrip(
       id: (json['id'] as num?)?.toInt() ?? 0,
       trainName: json['trainName'] as String? ?? '',
+      trainCode: json['trainCode'] as String? ?? '',
+      routeName: json['routeName'] as String? ?? '',
       fromStation: json['fromStation'] as String? ?? '',
       toStation: json['toStation'] as String? ?? '',
       departureTime: json['departureTime'] as String? ?? '',
       arrivalTime: json['arrivalTime'] as String? ?? '',
+      departureDate: json['departureDate'] as String?,
+      durationMinutes: (json['durationMinutes'] as num?)?.toInt() ?? 0,
       status: json['status'] as String? ?? '',
       passengerCount: (json['passengerCount'] as num?)?.toInt() ?? 0,
     );

@@ -279,6 +279,10 @@ class _QrCard extends StatelessWidget {
     );
   }
 
+  /// Dữ liệu QR = chuỗi ngắn "VETAU|<bookingCode>" — luôn dùng bookingCode
+  /// để tránh lỗi QrInputTooLongException khi BE trả SVG/Base64 quá dài.
+  String get _qrPayload => 'VETAU|$bookingCode';
+
   Widget _buildQr() {
     return Container(
       padding: const EdgeInsets.all(8),
@@ -294,7 +298,7 @@ class _QrCard extends StatelessWidget {
         ],
       ),
       child: QrImageView(
-        data: 'VETAU|$bookingCode',
+        data: _qrPayload,
         version: QrVersions.auto,
         size: 220.0,
         backgroundColor: Colors.white,

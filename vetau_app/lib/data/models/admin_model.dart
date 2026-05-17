@@ -15,6 +15,7 @@ class DashboardStats {
   final int totalStations;
   final int totalTrains;
   final int activeTrips;
+  final int totalCustomers;
 
   const DashboardStats({
     required this.totalBookings,
@@ -26,6 +27,7 @@ class DashboardStats {
     required this.totalStations,
     required this.totalTrains,
     required this.activeTrips,
+    required this.totalCustomers,
   });
 
   factory DashboardStats.fromJson(Map<String, dynamic> j) => DashboardStats(
@@ -38,6 +40,7 @@ class DashboardStats {
     totalStations: _int(j, 'totalStations'),
     totalTrains: _int(j, 'totalTrains'),
     activeTrips: _int(j, 'activeTrips'),
+    totalCustomers: _int(j, 'totalCustomers'),
   );
 
   static int _int(Map m, String k) =>

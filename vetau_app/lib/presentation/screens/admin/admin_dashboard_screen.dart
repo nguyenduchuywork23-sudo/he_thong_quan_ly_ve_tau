@@ -117,34 +117,37 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         // ── Infrastructure ────────────────────
         const _SectionHeader('Cơ sở hạ tầng'),
         const SizedBox(height: 10),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 1.6,
           children: [
-            Expanded(
-              child: _StatCard(
-                label: 'Ga tàu',
-                value: stats.totalStations.toString(),
-                icon: Icons.location_on_outlined,
-                color: const Color(0xFF8B5CF6),
-              ),
+            _StatCard(
+              label: 'Tổng khách',
+              value: stats.totalCustomers.toString(),
+              icon: Icons.people_outline,
+              color: const Color(0xFFF43F5E), // Rose color
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _StatCard(
-                label: 'Đoàn tàu',
-                value: stats.totalTrains.toString(),
-                icon: Icons.train_outlined,
-                color: const Color(0xFF06B6D4),
-              ),
+            _StatCard(
+              label: 'Ga tàu',
+              value: stats.totalStations.toString(),
+              icon: Icons.location_on_outlined,
+              color: const Color(0xFF8B5CF6), // Purple color
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _StatCard(
-                label: 'Chuyến chạy',
-                value: stats.activeTrips.toString(),
-                icon: Icons.route_outlined,
-                color: AppTheme.primary,
-              ),
+            _StatCard(
+              label: 'Đoàn tàu',
+              value: stats.totalTrains.toString(),
+              icon: Icons.train_outlined,
+              color: const Color(0xFF06B6D4), // Cyan color
+            ),
+            _StatCard(
+              label: 'Chuyến chạy',
+              value: stats.activeTrips.toString(),
+              icon: Icons.route_outlined,
+              color: AppTheme.primary,
             ),
           ],
         ),

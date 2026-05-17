@@ -117,7 +117,7 @@ class TripProvider extends ChangeNotifier {
 
   // ═══════════════════════════════════════════════
   // ACTIONS – TẢI DANH SÁCH GA TÀU
-  // Gọi GET /api/admin/stations
+  // Gọi GET /api/Trips/stations
   // Chỉ thành công khi user đã login (JWT hợp lệ)
   // Nếu 401 → _stationsState = error (UI hiển thị fallback text field)
   // ═══════════════════════════════════════════════

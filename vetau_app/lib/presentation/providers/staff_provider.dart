@@ -117,6 +117,9 @@ class StaffProvider extends ChangeNotifier {
       _pendingBookings.removeWhere((b) => (b['id'] as int?) == bookingId);
       _isActing = false;
       notifyListeners();
+      // Tự động làm mới dashboard + danh sách chờ để UI luôn đồng bộ
+      loadDashboard(force: true);
+      loadPendingBookings(force: true);
       return true;
     } on AppException catch (e) {
       _actError = e.message;
@@ -146,6 +149,9 @@ class StaffProvider extends ChangeNotifier {
       _pendingBookings.removeWhere((b) => (b['id'] as int?) == bookingId);
       _isActing = false;
       notifyListeners();
+      // Tự động làm mới dashboard + danh sách chờ để UI luôn đồng bộ
+      loadDashboard(force: true);
+      loadPendingBookings(force: true);
       return true;
     } on AppException catch (e) {
       _actError = e.message;

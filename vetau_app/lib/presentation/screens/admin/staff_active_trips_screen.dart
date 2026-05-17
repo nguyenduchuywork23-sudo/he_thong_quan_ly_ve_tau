@@ -92,7 +92,7 @@ class _StaffActiveTripsScreenState extends State<StaffActiveTripsScreen> {
                   child: const Icon(Icons.train,
                       color: AppTheme.success, size: 24),
                 ),
-                title: Text(trip.trainName,
+                title: Text('${trip.trainName} (${trip.trainCode}) – ${trip.routeName}',
                     style: const TextStyle(fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.textPrimary)),

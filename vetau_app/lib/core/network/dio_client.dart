@@ -94,7 +94,7 @@ class SessionInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final needsSession = _sessionPaths.any(
-      (p) => options.path.contains(p),
+      (p) => options.path.toLowerCase().contains(p),
     );
 
     if (needsSession) {

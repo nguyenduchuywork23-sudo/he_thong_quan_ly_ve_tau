@@ -199,9 +199,11 @@ class _TrainCard extends StatelessWidget {
             Row(children: [
               _StatPill(Icons.directions_railway_filled_outlined,
                   '$totalCarriages toa'),
-              const SizedBox(width: 10),
-              _StatPill(Icons.event_seat_outlined,
-                  '$totalSeats ghế'),
+              if (totalSeats > 0) ...[
+                const SizedBox(width: 10),
+                _StatPill(Icons.event_seat_outlined,
+                    '$totalSeats ghế'),
+              ],
               const SizedBox(width: 10),
               _StatPill(Icons.route_outlined, trainType.speed),
             ]),

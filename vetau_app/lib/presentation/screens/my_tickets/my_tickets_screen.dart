@@ -1,7 +1,6 @@
 /// MyTicketsScreen – Lịch sử vé đã đặt (đọc từ SharedPreferences)
 library;
 
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -286,22 +285,22 @@ class _QrBottomSheet extends StatelessWidget {
     required this.booking,
   });
 
+  /// Luôn dùng bookingCode làm dữ liệu QR — tránh lỗi QrInputTooLongException
+  /// khi BE trả về chuỗi SVG/Base64 quá dài trong qrCodeData.
   Widget _buildQr() {
-    if (qrCodeData != null && qrCodeData!.contains('base64,')) {
-      try {
-        final b64 = qrCodeData!.split('base64,')[1];
-        final bytes = base64Decode(b64);
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.memory(bytes, width: 220, height: 220, fit: BoxFit.contain),
-        );
-      } catch (_) {}
-    }
     return QrImageView(
-      data: qrCodeData?.isNotEmpty == true ? qrCodeData! : bookingCode,
+      data: 'VETAU|$bookingCode',
       version: QrVersions.auto,
       size: 220,
       backgroundColor: Colors.white,
+      eyeStyle: const QrEyeStyle(
+        eyeShape: QrEyeShape.square,
+        color: Colors.black,
+      ),
+      dataModuleStyle: const QrDataModuleStyle(
+        dataModuleShape: QrDataModuleShape.square,
+        color: Colors.black,
+      ),
     );
   }
 

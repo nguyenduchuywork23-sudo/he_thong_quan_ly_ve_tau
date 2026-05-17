@@ -170,35 +170,3 @@ class VetauApp extends StatelessWidget {
   }
 }
 
-// ── Admin placeholder (sẽ thay thế ở Phase Admin) ──
-class _AdminPlaceholder extends StatelessWidget {
-  const _AdminPlaceholder();
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surface,
-        title: const Text('Quản trị hệ thống'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 20),
-          onPressed: () => context.go('/'),
-        ),
-      ),
-      body: const Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(Icons.admin_panel_settings,
-              color: AppTheme.primary, size: 64),
-          SizedBox(height: 16),
-          Text('Màn hình Admin',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary)),
-          SizedBox(height: 8),
-          Text('Sẽ được triển khai ở Phase tiếp theo',
-              style: TextStyle(color: AppTheme.textSecondary)),
-        ]),
-      ),
-    );
-  }
-}
-
