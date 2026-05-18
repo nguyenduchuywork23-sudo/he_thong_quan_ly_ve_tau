@@ -1,18 +1,9 @@
-/// Dio HTTP Client – Network Layer duy nhất của app
-///
-/// Interceptors:
-///   [AuthInterceptor]    – Tự động đính kèm JWT Bearer Token
-///   [SessionInterceptor] – Tự động đính kèm X-Session-Id
-///   [ErrorInterceptor]   – Chuẩn hóa lỗi từ .NET Core response
 library;
 
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/api_constants.dart';
 
-// ═══════════════════════════════════════════════
-// DIO CLIENT SINGLETON
-// ═══════════════════════════════════════════════
 
 class DioClient {
   DioClient._();
@@ -21,8 +12,6 @@ class DioClient {
 
   late final Dio _dio;
 
-  /// Khởi tạo Dio và gắn interceptors.
-  /// Phải gọi [init()] trong main() trước khi dùng [dio].
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -53,10 +42,6 @@ class DioClient {
   Dio get dio => _dio;
 }
 
-// ═══════════════════════════════════════════════
-// INTERCEPTOR 1: JWT AUTH
-// Tự động thêm "Authorization: Bearer <token>" nếu đã đăng nhập
-// ═══════════════════════════════════════════════
 
 class AuthInterceptor extends Interceptor {
   final SharedPreferences _prefs;
@@ -72,18 +57,10 @@ class AuthInterceptor extends Interceptor {
   }
 }
 
-// ═══════════════════════════════════════════════
-// INTERCEPTOR 2: X-SESSION-ID
-// Tự động đính kèm X-Session-Id cho các endpoint:
-//   - POST /api/trips/lock-seat
-//   - POST /api/bookings
-// Nếu chưa có session, tự sinh UUID và lưu vào SharedPreferences
-// ═══════════════════════════════════════════════
 
 class SessionInterceptor extends Interceptor {
   final SharedPreferences _prefs;
 
-  /// Danh sách path cần X-Session-Id (khớp với logic Controller C#)
   static const _sessionPaths = [
     '/api/trips/lock-seat',
     '/api/bookings',
@@ -98,7 +75,6 @@ class SessionInterceptor extends Interceptor {
     );
 
     if (needsSession) {
-      // Lấy session hiện tại hoặc sinh mới
       String? sessionId = _prefs.getString(ApiConstants.keySessionId);
       if (sessionId == null || sessionId.isEmpty) {
         sessionId = _generateSessionId();
@@ -110,7 +86,6 @@ class SessionInterceptor extends Interceptor {
     handler.next(options);
   }
 
-  /// Sinh UUID v4 đơn giản không cần package bên ngoài
   String _generateSessionId() {
     final now = DateTime.now().millisecondsSinceEpoch;
     final rand = Object().hashCode.abs();
@@ -118,11 +93,6 @@ class SessionInterceptor extends Interceptor {
   }
 }
 
-// ═══════════════════════════════════════════════
-// INTERCEPTOR 3: ERROR HANDLER
-// Chuẩn hóa lỗi từ .NET Core (BadRequest, Unauthorized, NotFound…)
-// thành [AppException] có thể hiển thị trực tiếp cho user
-// ═══════════════════════════════════════════════
 
 class ErrorInterceptor extends Interceptor {
   final SharedPreferences _prefs;
@@ -132,7 +102,6 @@ class ErrorInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) {
     final response = err.response;
 
-    // Không có response = network error
     if (response == null) {
       handler.reject(
         DioException(
@@ -149,10 +118,8 @@ class ErrorInterceptor extends Interceptor {
 
     if (response.statusCode == 401) {
       _prefs.remove(ApiConstants.keyJwtToken);
-      // Có thể thêm báo hiệu logout ở đây (VD dùng global event bus)
     }
 
-    // Lấy message từ body .NET Core (format: { "message": "..." })
     String message = _extractMessage(response.data, err.response?.statusCode);
 
     handler.reject(
@@ -170,7 +137,6 @@ class ErrorInterceptor extends Interceptor {
 
   String _extractMessage(dynamic data, int? statusCode) {
     if (data is Map<String, dynamic>) {
-      // .NET Core trả về { "Message": "..." } hoặc { "message": "..." }
       return (data['Message'] ?? data['message'] ?? data['title'] ?? _statusMessage(statusCode))
           .toString();
     }
@@ -187,10 +153,6 @@ class ErrorInterceptor extends Interceptor {
       };
 }
 
-// ═══════════════════════════════════════════════
-// APP EXCEPTION
-// Lỗi có cấu trúc – Provider sẽ catch và hiển thị lên UI
-// ═══════════════════════════════════════════════
 
 class AppException implements Exception {
   final String message;
@@ -202,5 +164,4 @@ class AppException implements Exception {
   String toString() => 'AppException($statusCode): $message';
 }
 
-// ignore: avoid_print
 void debugPrint(String msg) => print(msg);

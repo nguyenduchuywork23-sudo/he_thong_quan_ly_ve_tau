@@ -1,5 +1,3 @@
-/// AdminService – Kết nối tất cả Admin API endpoints
-/// Yêu cầu JWT Bearer Token (AuthInterceptor tự đính kèm)
 library;
 
 import 'package:dio/dio.dart';
@@ -11,8 +9,6 @@ import '../models/trip_model.dart';
 class AdminService {
   final Dio _dio = DioClient.instance.dio;
 
-  // ── Dashboard ──────────────────────────────
-  /// GET /api/admin/dashboard
   Future<DashboardStats> getDashboard() async {
     try {
       final res = await _dio.get(ApiConstants.adminDashboard);
@@ -27,8 +23,6 @@ class AdminService {
     }
   }
 
-  // ── Bookings ───────────────────────────────
-  /// GET /api/admin/bookings
   Future<List<AdminBooking>> getBookings({
     String? status,
     String? search,
@@ -50,7 +44,6 @@ class AdminService {
             .map((e) => AdminBooking.fromJson(e as Map<String, dynamic>))
             .toList();
       }
-      // Nếu response có wrapper { items: [...] }
       if (data is Map && data['items'] is List) {
         return (data['items'] as List)
             .map((e) => AdminBooking.fromJson(e as Map<String, dynamic>))
@@ -67,7 +60,6 @@ class AdminService {
     }
   }
 
-  /// PUT /api/admin/bookings/{id}/status
   Future<void> updateBookingStatus(int bookingId, String status) async {
     try {
       await _dio.put(
@@ -84,8 +76,6 @@ class AdminService {
     }
   }
 
-  // ── Stations ───────────────────────────────
-  /// GET /api/admin/stations
   Future<List<StationModel>> getStations() async {
     try {
       final res = await _dio.get(ApiConstants.adminStations);
@@ -104,7 +94,6 @@ class AdminService {
     }
   }
 
-  /// POST /api/admin/stations
   Future<StationModel> createStation(Map<String, dynamic> data) async {
     try {
       final res = await _dio.post(ApiConstants.adminStations, data: data);
@@ -119,7 +108,6 @@ class AdminService {
     }
   }
 
-  /// PUT /api/admin/stations/{id}
   Future<StationModel> updateStation(int id, Map<String, dynamic> data) async {
     try {
       final res = await _dio.put(ApiConstants.adminStationById(id), data: data);
@@ -134,7 +122,6 @@ class AdminService {
     }
   }
 
-  /// DELETE /api/admin/stations/{id}
   Future<void> deleteStation(int id) async {
     try {
       await _dio.delete(ApiConstants.adminDeleteStation(id));
@@ -148,8 +135,6 @@ class AdminService {
     }
   }
 
-  // ── Trains ─────────────────────────────────
-  /// GET /api/admin/trains
   Future<List<Map<String, dynamic>>> getTrains() async {
     try {
       final res = await _dio.get(ApiConstants.adminTrains);

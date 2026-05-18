@@ -1,7 +1,3 @@
-/// StaffPendingScreen – Danh sách đơn vé chờ duyệt
-/// GET /api/Staff/pending-bookings
-/// PUT /api/Staff/bookings/{id}/approve
-/// PUT /api/Staff/bookings/{id}/reject
 library;
 
 import 'package:flutter/material.dart';
@@ -32,7 +28,6 @@ class _StaffPendingScreenState extends State<StaffPendingScreen> {
   }
 
   Future<void> _reject(BuildContext ctx, int bookingId, String code) async {
-    // Hỏi lý do
     final reasonCtrl = TextEditingController();
     final confirmed = await showDialog<bool>(
       context: ctx,
@@ -164,7 +159,6 @@ class _StaffPendingScreenState extends State<StaffPendingScreen> {
                 padding: const EdgeInsets.all(14),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  // Header
                   Row(children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -193,7 +187,6 @@ class _StaffPendingScreenState extends State<StaffPendingScreen> {
                   const Divider(color: AppTheme.cardBorder, height: 1),
                   const SizedBox(height: 8),
 
-                  // Trip info
                   Row(children: [
                     const Icon(Icons.train_outlined,
                         size: 14, color: AppTheme.textSecondary),
@@ -219,7 +212,6 @@ class _StaffPendingScreenState extends State<StaffPendingScreen> {
                   ]),
                   const SizedBox(height: 12),
 
-                  // Action buttons
                   Row(children: [
                     Expanded(child: OutlinedButton.icon(
                       onPressed: sp.isActing

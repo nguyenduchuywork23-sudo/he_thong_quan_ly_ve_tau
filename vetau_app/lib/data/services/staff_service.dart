@@ -1,13 +1,9 @@
-/// StaffService – Kết nối tất cả Staff API endpoints
-/// Yêu cầu JWT Bearer Token (role = admin | staff)
-/// AuthInterceptor tự đính kèm token vào mọi request.
 library;
 
 import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/constants/api_constants.dart';
 
-// ─── Data models nội bộ (chỉ dùng trong Staff layer) ────────────────────────
 
 class StaffDashboardStats {
   final int pendingBookings;
@@ -106,13 +102,10 @@ class ActiveTrip {
   }
 }
 
-// ─── Service ─────────────────────────────────────────────────────────────────
 
 class StaffService {
   final Dio _dio = DioClient.instance.dio;
 
-  // ── Dashboard ──────────────────────────────────────────────────────
-  /// GET /api/Staff/dashboard
   Future<StaffDashboardStats> getDashboard() async {
     try {
       final res = await _dio.get(ApiConstants.staffDashboard);
@@ -127,9 +120,6 @@ class StaffService {
     }
   }
 
-  // ── Pending Bookings ────────────────────────────────────────────────
-  /// GET /api/Staff/pending-bookings
-  /// Trả về raw List<Map> để tương thích với AdminBooking.fromJson
   Future<List<Map<String, dynamic>>> getPendingBookings() async {
     try {
       final res = await _dio.get(ApiConstants.staffPendingBookings);
@@ -148,8 +138,6 @@ class StaffService {
     }
   }
 
-  // ── Approve Booking ─────────────────────────────────────────────────
-  /// PUT /api/Staff/bookings/{id}/approve
   Future<void> approveBooking(int bookingId) async {
     try {
       await _dio.put(ApiConstants.staffApproveBooking(bookingId));
@@ -165,9 +153,6 @@ class StaffService {
     }
   }
 
-  // ── Reject Booking ──────────────────────────────────────────────────
-  /// PUT /api/Staff/bookings/{id}/reject
-  /// [reason] là lý do từ chối (tùy chọn)
   Future<void> rejectBooking(int bookingId, {String? reason}) async {
     try {
       await _dio.put(
@@ -186,8 +171,6 @@ class StaffService {
     }
   }
 
-  // ── Passenger Stats ─────────────────────────────────────────────────
-  /// GET /api/Staff/passenger-stats
   Future<PassengerStats> getPassengerStats() async {
     try {
       final res = await _dio.get(ApiConstants.staffPassengerStats);
@@ -202,8 +185,6 @@ class StaffService {
     }
   }
 
-  // ── Active Trips ────────────────────────────────────────────────────
-  /// GET /api/Staff/active-trips
   Future<List<ActiveTrip>> getActiveTrips() async {
     try {
       final res = await _dio.get(ApiConstants.staffActiveTrips);

@@ -1,4 +1,3 @@
-/// AdminBookingsScreen – Quản lý vé toàn hệ thống
 library;
 
 import 'package:flutter/material.dart';
@@ -60,10 +59,8 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
   Widget build(BuildContext context) {
     return Consumer<AdminProvider>(builder: (ctx, ap, _) {
       return Column(children: [
-        // ── Filter & Search bar ─────────────────
         _FilterBar(ap: ap, searchCtrl: _searchCtrl),
 
-        // ── Content ─────────────────────────────
         Expanded(child: _buildBody(ctx, ap)),
       ]);
     });
@@ -121,9 +118,6 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
   }
 }
 
-// ══════════════════════════════════════════════
-// FILTER BAR
-// ══════════════════════════════════════════════
 class _FilterBar extends StatelessWidget {
   final AdminProvider ap;
   final TextEditingController searchCtrl;
@@ -141,7 +135,6 @@ class _FilterBar extends StatelessWidget {
     return Container(
       color: AppTheme.surface,
       child: Column(children: [
-        // Search
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
           child: TextField(
@@ -166,7 +159,6 @@ class _FilterBar extends StatelessWidget {
             ),
           ),
         ),
-        // Status filter chips
         SizedBox(
           height: 40,
           child: ListView(
@@ -202,7 +194,6 @@ class _FilterBar extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        // Count
         Padding(
           padding: const EdgeInsets.only(left: 12, bottom: 6),
           child: Align(
@@ -218,9 +209,6 @@ class _FilterBar extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════
-// BOOKING CARD
-// ══════════════════════════════════════════════
 class _AdminBookingCard extends StatelessWidget {
   final AdminBooking booking;
   final VoidCallback onTap;
@@ -266,11 +254,9 @@ class _AdminBookingCard extends StatelessWidget {
           boxShadow: AppTheme.softShadow,
         ),
         child: Column(children: [
-          // ── Header ────────────────────────────
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(children: [
-              // Booking code
               Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -283,7 +269,6 @@ class _AdminBookingCard extends StatelessWidget {
                           fontSize: 11, color: AppTheme.textHint)),
                 ],
               )),
-              // Status badge
               Container(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 10, vertical: 5),
@@ -306,11 +291,9 @@ class _AdminBookingCard extends StatelessWidget {
 
           const Divider(height: 1),
 
-          // ── Body ──────────────────────────────
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(children: [
-              // Passenger
               Row(children: [
                 const Icon(Icons.person_outline,
                     size: 14, color: AppTheme.textHint),
@@ -324,7 +307,6 @@ class _AdminBookingCard extends StatelessWidget {
                         fontSize: 12, color: AppTheme.textSecondary)),
               ]),
               const SizedBox(height: 8),
-              // Route
               Row(children: [
                 const Icon(Icons.train, size: 14, color: AppTheme.textHint),
                 const SizedBox(width: 6),
@@ -350,7 +332,6 @@ class _AdminBookingCard extends StatelessWidget {
             ]),
           ),
 
-          // ── Action hint (Pending only) ─────────
           if (booking.isPending)
             Container(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -379,9 +360,6 @@ class _AdminBookingCard extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════
-// CONFIRM / CANCEL DIALOG
-// ══════════════════════════════════════════════
 class _BookingActionDialog extends StatelessWidget {
   final AdminBooking booking;
   const _BookingActionDialog({required this.booking});
@@ -432,7 +410,6 @@ class _BookingActionDialog extends StatelessWidget {
       ]),
       actionsAlignment: MainAxisAlignment.center,
       actions: [
-        // Cancel booking
         OutlinedButton.icon(
           onPressed: () => Navigator.pop(context, 'Cancelled'),
           icon: const Icon(Icons.cancel_outlined,
@@ -444,7 +421,6 @@ class _BookingActionDialog extends StatelessWidget {
             minimumSize: const Size(120, 44),
           ),
         ),
-        // Confirm payment
         ElevatedButton.icon(
           onPressed: () => Navigator.pop(context, 'Confirmed'),
           icon: const Icon(Icons.check_circle_outline, size: 16),

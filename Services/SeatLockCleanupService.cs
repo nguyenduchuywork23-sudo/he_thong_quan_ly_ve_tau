@@ -33,7 +33,6 @@ namespace VetauBackend.Services
                     {
                         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                        // Release expired locks
                         var expiredLocks = await context.SeatLocks
                             .Where(sl => sl.LockedUntil < DateTime.UtcNow && !sl.IsReleased)
                             .ToListAsync(stoppingToken);
@@ -48,7 +47,6 @@ namespace VetauBackend.Services
                             _logger.LogInformation($"Released {expiredLocks.Count} expired seat locks.");
                         }
 
-                        // Expire pending bookings that pass payment deadline
                         var expiredBookings = await context.Bookings
                             .Where(b => b.Status == "pending" && b.PaymentDeadline < DateTime.UtcNow)
                             .ToListAsync(stoppingToken);
@@ -69,7 +67,6 @@ namespace VetauBackend.Services
                     _logger.LogError(ex, "Error occurred executing SeatLockCleanupService.");
                 }
 
-                // Run every minute
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
         }

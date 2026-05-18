@@ -1,4 +1,3 @@
-/// AdminDashboardScreen – Tổng quan thống kê hệ thống
 library;
 
 import 'package:flutter/material.dart';
@@ -70,11 +69,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // ── Revenue highlight ─────────────────
         _RevenueCard(stats: stats, priceFmt: priceFmt),
         const SizedBox(height: 16),
 
-        // ── Booking stats grid ────────────────
         const _SectionHeader('Thống kê vé'),
         const SizedBox(height: 10),
         GridView.count(
@@ -114,7 +111,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         ),
         const SizedBox(height: 16),
 
-        // ── Infrastructure ────────────────────
         const _SectionHeader('Cơ sở hạ tầng'),
         const SizedBox(height: 10),
         GridView.count(
@@ -157,7 +153,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 }
 
-// ── Revenue highlight card ─────────────────────
 class _RevenueCard extends StatelessWidget {
   final DashboardStats stats;
   final NumberFormat priceFmt;
@@ -220,7 +215,6 @@ class _RevenueCard extends StatelessWidget {
   }
 }
 
-// ── Stat card ─────────────────────────────────
 class _StatCard extends StatelessWidget {
   final String label, value;
   final IconData icon;

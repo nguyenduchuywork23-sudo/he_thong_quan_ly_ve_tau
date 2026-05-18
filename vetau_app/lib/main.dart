@@ -1,10 +1,3 @@
-/// main.dart – Entry point của ứng dụng
-///
-/// Khởi tạo:
-///   1. DioClient (Interceptors)
-///   2. AuthProvider (restore session từ SharedPreferences)
-///   3. MultiProvider bọc toàn bộ app
-///   4. GoRouter với các route
 library;
 
 import 'package:flutter/material.dart';
@@ -33,16 +26,13 @@ import 'presentation/screens/admin/staff_layout.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Cố định portrait mode cho mobile
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // Khởi tạo Dio với interceptors
   await DioClient.instance.init();
 
-  // Khởi tạo AuthProvider để restore session nếu có
   final authProvider = AuthProvider();
   await authProvider.init();
 
@@ -60,78 +50,65 @@ void main() async {
   );
 }
 
-// ═══════════════════════════════════════════════
-// ROUTER
-// ═══════════════════════════════════════════════
 
 final GoRouter _router = GoRouter(
   initialLocation: '/',
   debugLogDiagnostics: true,
   routes: [
-    // Màn hình tìm kiếm (Home)
     GoRoute(
       path: '/',
       name: 'home',
       builder: (context, state) => const HomeScreen(),
     ),
 
-    // Kết quả tìm kiếm chuyến tàu
     GoRoute(
       path: '/search-result',
       name: 'search-result',
       builder: (context, state) => const SearchResultScreen(),
     ),
 
-    // Chọn ghế
     GoRoute(
       path: '/seat-selection',
       name: 'seat-selection',
       builder: (context, state) => const SeatSelectionScreen(),
     ),
 
-    // Form hành khách
     GoRoute(
       path: '/passenger-form',
       name: 'passenger-form',
       builder: (context, state) => const PassengerFormScreen(),
     ),
 
-    // Xác nhận & QR
     GoRoute(
       path: '/booking-success',
       name: 'booking-success',
       builder: (context, state) => const BookingConfirmScreen(),
     ),
 
-    // Đăng nhập
     GoRoute(
       path: '/login',
       name: 'login',
       builder: (context, state) => const LoginScreen(),
     ),
 
-    // Đăng ký
     GoRoute(
       path: '/register',
       name: 'register',
       builder: (context, state) => const RegisterScreen(),
     ),
 
-    // Vé của tôi
     GoRoute(
       path: '/my-tickets',
       name: 'my-tickets',
       builder: (context, state) => const MyTicketsScreen(),
     ),
 
-    // Admin Panel (chỉ role = admin)
     GoRoute(
       path: '/admin',
       name: 'admin',
       builder: (context, state) => const AdminLayout(),
     ),
 
-    // Staff Panel (role = staff)
     GoRoute(
       path: '/staff',
       name: 'staff',
@@ -140,9 +117,6 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-// ═══════════════════════════════════════════════
-// APP WIDGET
-// ═══════════════════════════════════════════════
 
 class VetauApp extends StatelessWidget {
   const VetauApp({super.key});
@@ -155,7 +129,6 @@ class VetauApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       routerConfig: _router,
 
-      // SEO / Accessibility
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(

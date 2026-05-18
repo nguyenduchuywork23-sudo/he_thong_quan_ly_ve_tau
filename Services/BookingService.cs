@@ -29,13 +29,11 @@ namespace VetauBackend.Services
 
         public async Task<Booking?> CreateBookingAsync(CreateBookingRequest req, string sessionId, int? userId)
         {
-            // 1. Kiểm tra session có sở hữu lock ghế này không
             var slock = await _context.SeatLocks
                 .FirstOrDefaultAsync(sl => sl.TripId == req.TripId && sl.SeatId == req.SeatId && sl.SessionId == sessionId && !sl.IsReleased && sl.LockedUntil > DateTime.UtcNow);
             
             if (slock == null) throw new Exception("Ghế chưa được giữ hoặc thời gian giữ chỗ đã hết hạn.");
 
-            // 2. Tính giá
             var trip = await _context.Trips.FindAsync(req.TripId);
             var carriage = await _context.Carriages.FindAsync(req.CarriageId);
             var multiplier = await _context.PriceMultipliers.FirstOrDefaultAsync(m => m.CarriageType == carriage.CarriageType);
@@ -50,7 +48,6 @@ namespace VetauBackend.Services
             }
             double finalPrice = basePrice * (100 - discountPercent) / 100;
 
-            // 3. Tạo Booking
             var deadlineMinutes = _config.GetValue<int>("AppConfig:PaymentDeadlineMinutes", 30);
             string bookingCode = "VT" + DateTime.Now.ToString("yyyyMMdd") + new Random().Next(100, 999).ToString();
 
@@ -77,14 +74,11 @@ namespace VetauBackend.Services
                 PaymentDeadline = DateTime.UtcNow.AddMinutes(deadlineMinutes),
             };
 
-            // Sinh QR Code dạng data URI SVG
             string svgQr = _paymentService.GenerateVietQr("970422", "0123456789", finalPrice, bookingCode);
-            // Prefix chuẩn để thẻ <img> hiển thị được
             booking.QrCodeData = "data:image/svg+xml;utf8," + Uri.EscapeDataString(svgQr);
 
             _context.Bookings.Add(booking);
             
-            // Đánh dấu lock đã release để người khác không bị nhầm
             slock.IsReleased = true;
 
             await _context.SaveChangesAsync();

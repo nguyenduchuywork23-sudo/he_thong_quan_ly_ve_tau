@@ -1,21 +1,6 @@
-/// Train Models – ánh xạ 1:1 từ C# Models/Entities.cs
-///
-/// C# classes được chuyển đổi:
-///   Train       → [TrainModel]
-///   Carriage    → [CarriageModel]   (ICollection<Seat> → List<SeatModel>)
-///   Seat        → [SeatModel]
-///
-/// Response shapes từ TripService.GetAvailableSeatsAsync():
-///   CarriageWithSeats  → [CarriageWithSeats]   (anonymous object C#)
-///   SeatAvailability   → [SeatAvailability]    (anonymous object C#)
 library;
 
-// ═══════════════════════════════════════════════
-// ENTITY MODELS (ánh xạ từ class C# thuần)
-// ═══════════════════════════════════════════════
 
-/// Ánh xạ từ class Train trong Entities.cs
-/// TrainType: "express" | "local"
 class TrainModel {
   final int id;
   final String name;
@@ -62,16 +47,7 @@ class TrainModel {
       };
 }
 
-// ─────────────────────────────────────────────
 
-/// Ánh xạ từ class Carriage trong Entities.cs
-///
-/// carriageType (từ BE comment):
-///   "hard_seat"    → Ghế cứng
-///   "soft_seat"    → Ghế mềm
-///   "hard_berth_6" → Giường nằm cứng 6 chỗ
-///   "soft_berth_4" → Giường nằm mềm 4 chỗ
-///   "vip"          → VIP/Hạng nhất
 class CarriageModel {
   final int id;
   final int trainId;
@@ -117,7 +93,6 @@ class CarriageModel {
         'seats': seats.map((s) => s.toJson()).toList(),
       };
 
-  /// Tên hiển thị thân thiện theo loại toa
   String get displayName {
     switch (carriageType) {
       case 'hard_seat':
@@ -136,12 +111,7 @@ class CarriageModel {
   }
 }
 
-// ─────────────────────────────────────────────
 
-/// Ánh xạ từ class Seat trong Entities.cs
-///
-/// seatPosition (từ BE comment):
-///   "window" | "aisle" | "middle" | "upper" | "lower"
 class SeatModel {
   final int id;
   final int carriageId;
@@ -181,17 +151,7 @@ class SeatModel {
       };
 }
 
-// ═══════════════════════════════════════════════
-// RESPONSE SHAPES (từ anonymous objects C# trong TripService)
-// Đây KHÔNG phải Entity thuần – là DTO trả về từ
-// TripService.GetAvailableSeatsAsync()
-// ═══════════════════════════════════════════════
 
-/// Trạng thái của một ghế trong chuyến tàu cụ thể.
-/// Ánh xạ từ anonymous object bên trong TripService.GetAvailableSeatsAsync():
-/// ```csharp
-/// new { s.Id, s.SeatNumber, s.Floor, IsAvailable = ..., Price = ... }
-/// ```
 class SeatAvailability {
   final int id;
   final String seatNumber;
@@ -226,7 +186,6 @@ class SeatAvailability {
         'price': price,
       };
 
-  /// Tạo bản sao với isAvailable mới (dùng khi user đang chọn/bỏ chọn ghế)
   SeatAvailability copyWith({bool? isAvailable}) {
     return SeatAvailability(
       id: id,
@@ -238,13 +197,7 @@ class SeatAvailability {
   }
 }
 
-// ─────────────────────────────────────────────
 
-/// Toa tàu kèm danh sách ghế với trạng thái real-time.
-/// Ánh xạ từ anonymous object bên trong TripService.GetAvailableSeatsAsync():
-/// ```csharp
-/// new { c.Id, c.CarriageNumber, c.CarriageType, Seats = seats }
-/// ```
 class CarriageWithSeats {
   final int id;
   final int carriageNumber;
@@ -277,7 +230,6 @@ class CarriageWithSeats {
         'seats': seats.map((s) => s.toJson()).toList(),
       };
 
-  /// Tên hiển thị cho tab toa
   String get displayName {
     final typeName = switch (carriageType) {
       'hard_seat' => 'Ghế cứng',
@@ -290,10 +242,8 @@ class CarriageWithSeats {
     return 'Toa $carriageNumber\n$typeName';
   }
 
-  /// Số ghế còn trống
   int get availableCount => seats.where((s) => s.isAvailable).length;
 
-  /// Giá thấp nhất trong toa (thường tất cả ghế cùng giá)
   double get minPrice =>
       seats.isNotEmpty ? seats.map((s) => s.price).reduce((a, b) => a < b ? a : b) : 0;
 }

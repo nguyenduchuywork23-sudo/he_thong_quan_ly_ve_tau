@@ -1,4 +1,3 @@
-/// AdminProvider – State Management cho Admin Panel
 library;
 
 import 'package:flutter/foundation.dart';
@@ -12,35 +11,29 @@ enum AdminLoadState { idle, loading, loaded, error }
 class AdminProvider extends ChangeNotifier {
   final AdminService _service = AdminService();
 
-  // ── Dashboard ──────────────────────────────
   AdminLoadState _dashState = AdminLoadState.idle;
   DashboardStats? _stats;
   String? _dashError;
 
-  // ── Bookings ───────────────────────────────
   AdminLoadState _bookingsState = AdminLoadState.idle;
   List<AdminBooking> _bookings = [];
   String? _bookingsError;
   String _statusFilter = 'all'; // all | Pending | Confirmed | Cancelled
   String _searchQuery = '';
 
-  // ── Update status ──────────────────────────
   bool _isUpdating = false;
   String? _updateError;
 
-  // ── Stations ───────────────────────────────
   AdminLoadState _stationsState = AdminLoadState.idle;
   List<StationModel> _stations = [];
   bool _isStationOp = false;   // create / update / delete in progress
   String? _stationOpError;
 
-  // ── Trains ─────────────────────────────────
   AdminLoadState _trainsState = AdminLoadState.idle;
   List<Map<String, dynamic>> _trains = [];
   String? _trainsError;
 
 
-  // ─── Getters ──────────────────────────────
   AdminLoadState get dashState => _dashState;
   DashboardStats? get stats => _stats;
   String? get dashError => _dashError;
@@ -67,7 +60,6 @@ class AdminProvider extends ChangeNotifier {
   List<Map<String, dynamic>> get trains => List.unmodifiable(_trains);
   String? get trainsError => _trainsError;
 
-  // ─── Filter bookings locally ───────────────
   List<AdminBooking> _filteredBookings() {
     var list = _bookings;
     if (_statusFilter != 'all') {
@@ -84,9 +76,6 @@ class AdminProvider extends ChangeNotifier {
     return list;
   }
 
-  // ════════════════════════════════════════════
-  // ACTIONS – DASHBOARD
-  // ════════════════════════════════════════════
   Future<void> loadDashboard({bool force = false}) async {
     if (_dashState == AdminLoadState.loaded && !force) return;
     _dashState = AdminLoadState.loading;
@@ -105,9 +94,6 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ════════════════════════════════════════════
-  // ACTIONS – BOOKINGS
-  // ════════════════════════════════════════════
   Future<void> loadBookings({bool force = false}) async {
     if (_bookingsState == AdminLoadState.loaded && !force) return;
     _bookingsState = AdminLoadState.loading;
@@ -136,15 +122,12 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// PUT /api/admin/bookings/{id}/status
-  /// Trả về true nếu thành công, false nếu lỗi
   Future<bool> updateBookingStatus(int bookingId, String newStatus) async {
     _isUpdating = true;
     _updateError = null;
     notifyListeners();
     try {
       await _service.updateBookingStatus(bookingId, newStatus);
-      // Cập nhật local state ngay (optimistic update)
       final idx = _bookings.indexWhere((b) => b.id == bookingId);
       if (idx != -1) {
         final old = _bookings[idx];
@@ -189,9 +172,6 @@ class AdminProvider extends ChangeNotifier {
     }
   }
 
-  // ════════════════════════════════════════════
-  // ACTIONS – STATIONS CRUD
-  // ════════════════════════════════════════════
   Future<void> loadStations({bool force = false}) async {
     if (_stationsState == AdminLoadState.loaded && !force) return;
     _stationsState = AdminLoadState.loading;
@@ -209,7 +189,6 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Tạo ga mới. Trả về null nếu thành công, String lỗi nếu thất bại.
   Future<String?> createStation({
     required String name,
     required String code,
@@ -248,7 +227,6 @@ class AdminProvider extends ChangeNotifier {
     }
   }
 
-  /// Cập nhật ga. Trả về null nếu thành công, String lỗi nếu thất bại.
   Future<String?> updateStation(
     int id, {
     required String name,
@@ -288,7 +266,6 @@ class AdminProvider extends ChangeNotifier {
     }
   }
 
-  /// Xóa ga. Trả về null nếu thành công, String lỗi nếu thất bại.
   Future<String?> deleteStation(int id) async {
     _isStationOp = true;
     _stationOpError = null;
@@ -317,9 +294,6 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ════════════════════════════════════════════
-  // ACTIONS – TRAINS
-  // ════════════════════════════════════════════
   Future<void> loadTrains({bool force = false}) async {
     if (_trainsState == AdminLoadState.loaded && !force) return;
     _trainsState = AdminLoadState.loading;

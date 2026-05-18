@@ -10,20 +10,16 @@ namespace VetauBackend.Services
 {
     public interface IAdminService
     {
-        // Quản lý Ga tàu (Stations)
         Task<List<Station>> GetStationsAsync();
         Task<Station?> CreateStationAsync(Station station);
         Task<Station?> UpdateStationAsync(int id, Station stationIn);
         Task<bool> DeleteStationAsync(int id);
 
-        // Quản lý Tàu (Trains)
         Task<List<Train>> GetTrainsAsync();
 
-        // Quản lý Đơn vé (Bookings)
         Task<object> GetBookingsAsync(int page = 1, int pageSize = 50, string? status = null, string? search = null);
         Task<bool> UpdateBookingStatusAsync(int id, string status);
         
-        // Thống kê Dashboard
         Task<object> GetDashboardStatsAsync();
     }
 
@@ -72,7 +68,6 @@ namespace VetauBackend.Services
             var station = await _context.Stations.FindAsync(id);
             if (station == null) return false;
 
-            // Đơn giản là đánh dấu InActive thay vì xóa thật nếu có liên kết
             station.IsActive = false;
             await _context.SaveChangesAsync();
             return true;
@@ -83,10 +78,6 @@ namespace VetauBackend.Services
             return await _context.Trains.Include(t => t.Carriages).ToListAsync();
         }
 
-        /// <summary>
-        /// Trả về flat DTO cho FE AdminBooking.fromJson — include đầy đủ
-        /// Trip.Train, FromStation, ToStation, Seat, Carriage. Hỗ trợ phân trang và lọc.
-        /// </summary>
         public async Task<object> GetBookingsAsync(int page = 1, int pageSize = 50, string? status = null, string? search = null)
         {
             var query = _context.Bookings
@@ -145,7 +136,6 @@ namespace VetauBackend.Services
                 b.ToStationId,
                 b.SeatId,
                 b.CarriageId,
-                // Flat fields cho FE
                 TrainName = b.Trip?.Train?.Name ?? "",
                 FromStation = b.FromStation?.Name ?? "",
                 ToStation = b.ToStation?.Name ?? "",
@@ -174,11 +164,6 @@ namespace VetauBackend.Services
             return true;
         }
 
-        /// <summary>
-        /// Dashboard trả đầy đủ các trường FE DashboardStats.fromJson cần:
-        /// totalBookings, pendingBookings, confirmedBookings, cancelledBookings,
-        /// totalRevenue, todayRevenue, totalStations, totalTrains, activeTrips, totalCustomers
-        /// </summary>
         public async Task<object> GetDashboardStatsAsync()
         {
             var today = DateTime.UtcNow.Date;

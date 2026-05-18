@@ -1,4 +1,3 @@
-/// AdminTrainsScreen – Danh sách Đoàn tàu (Read-only + Refresh)
 library;
 
 import 'package:flutter/material.dart';
@@ -35,13 +34,11 @@ class _AdminTrainsScreenState extends State<AdminTrainsScreen> {
   }
 
   Widget _buildBody(AdminProvider ap) {
-    // Loading
     if (ap.trainsState == AdminLoadState.loading && ap.trains.isEmpty) {
       return const Center(
           child: CircularProgressIndicator(color: AppTheme.primary));
     }
 
-    // Error
     if (ap.trainsState == AdminLoadState.error && ap.trains.isEmpty) {
       return Center(child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -61,7 +58,6 @@ class _AdminTrainsScreenState extends State<AdminTrainsScreen> {
       ));
     }
 
-    // Empty
     if (ap.trains.isEmpty) {
       return Center(child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -87,9 +83,6 @@ class _AdminTrainsScreenState extends State<AdminTrainsScreen> {
   }
 }
 
-// ══════════════════════════════════════════════
-// TRAIN CARD
-// ══════════════════════════════════════════════
 class _TrainCard extends StatelessWidget {
   final Map<String, dynamic> data;
   const _TrainCard({required this.data});
@@ -115,35 +108,29 @@ class _TrainCard extends StatelessWidget {
     final totalCarriages = _int('totalCarriages');
     final totalSeats = _int('totalSeats');
 
-    // Phân loại tàu từ tên: SE (Thống Nhất), TN (Thống Nhất chậm), etc.
     final trainType = _getTrainType(name);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.0),
         border: Border.all(color: AppTheme.cardBorder, width: 0.5),
-        boxShadow: AppTheme.softShadow,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.05),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
       ),
       child: Column(children: [
-        // Header
-        Container(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: isActive
-                ? const Color(0xFF1A1F4E).withOpacity(0.6)
-                : Colors.transparent,
-            borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(AppTheme.radiusCard)),
-            border: const Border(
-                bottom: BorderSide(color: AppTheme.cardBorder)),
-          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Row(children: [
-            // Icon
             Container(
-              width: 42, height: 42,
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
                 color: trainType.color.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(10),
@@ -151,31 +138,32 @@ class _TrainCard extends StatelessWidget {
               child: Icon(Icons.train, color: trainType.color, size: 22),
             ),
             const SizedBox(width: 12),
-
-            // Name + type
-            Expanded(child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name, style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w800,
-                    color: AppTheme.textPrimary)),
-                Text(trainType.label, style: TextStyle(
-                    fontSize: 12, color: trainType.color,
-                    fontWeight: FontWeight.w600)),
-              ],
-            )),
-
-            // Status badge
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name,
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A237E))),
+                  Text(trainType.label,
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
             Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: (isActive ? AppTheme.success : AppTheme.warning)
                     .withOpacity(0.12),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: (isActive ? AppTheme.success : AppTheme.warning)
-                      .withOpacity(0.4)),
+                    color: (isActive ? AppTheme.success : AppTheme.warning)
+                        .withOpacity(0.4)),
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 Icon(isActive ? Icons.check_circle : Icons.build_circle,
@@ -184,37 +172,36 @@ class _TrainCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(isActive ? 'Hoạt động' : 'Bảo trì',
                     style: TextStyle(
-                        fontSize: 11, fontWeight: FontWeight.w700,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
                         color: isActive
-                            ? AppTheme.success : AppTheme.warning)),
+                            ? AppTheme.success
+                            : AppTheme.warning)),
               ]),
             ),
           ]),
         ),
-
-        // Body – stats & description
+        Divider(color: Colors.grey[200], height: 1),
         Padding(
           padding: const EdgeInsets.all(14),
           child: Column(children: [
-            // Stats row
             Row(children: [
               _StatPill(Icons.directions_railway_filled_outlined,
                   '$totalCarriages toa'),
               if (totalSeats > 0) ...[
                 const SizedBox(width: 10),
-                _StatPill(Icons.event_seat_outlined,
-                    '$totalSeats ghế'),
+                _StatPill(Icons.event_seat_outlined, '$totalSeats ghế'),
               ],
               const SizedBox(width: 10),
               _StatPill(Icons.route_outlined, trainType.speed),
             ]),
-
-            // Description
             if (description.isNotEmpty) ...[
               const SizedBox(height: 10),
-              Text(description, style: const TextStyle(
-                  fontSize: 12, color: AppTheme.textSecondary,
-                  height: 1.4)),
+              Text(description,
+                  style: const TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.textSecondary,
+                      height: 1.4)),
             ],
           ]),
         ),

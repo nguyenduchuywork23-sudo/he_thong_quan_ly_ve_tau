@@ -1,5 +1,3 @@
-/// StaffProvider – State Management cho Staff Panel
-/// Quản lý: Dashboard, Pending Bookings, Approve/Reject, Passenger Stats, Active Trips
 library;
 
 import 'package:flutter/foundation.dart';
@@ -11,31 +9,25 @@ enum StaffLoadState { idle, loading, loaded, error }
 class StaffProvider extends ChangeNotifier {
   final StaffService _service = StaffService();
 
-  // ── Dashboard ──────────────────────────────
   StaffLoadState _dashState = StaffLoadState.idle;
   StaffDashboardStats? _dashStats;
   String? _dashError;
 
-  // ── Pending Bookings ───────────────────────
   StaffLoadState _pendingState = StaffLoadState.idle;
   List<Map<String, dynamic>> _pendingBookings = [];
   String? _pendingError;
 
-  // ── Approve / Reject ───────────────────────
   bool _isActing = false;
   String? _actError;
 
-  // ── Passenger Stats ────────────────────────
   StaffLoadState _statsState = StaffLoadState.idle;
   PassengerStats? _passengerStats;
   String? _statsError;
 
-  // ── Active Trips ───────────────────────────
   StaffLoadState _tripsState = StaffLoadState.idle;
   List<ActiveTrip> _activeTrips = [];
   String? _tripsError;
 
-  // ─── Getters ──────────────────────────────
   StaffLoadState get dashState => _dashState;
   StaffDashboardStats? get dashStats => _dashStats;
   String? get dashError => _dashError;
@@ -58,10 +50,6 @@ class StaffProvider extends ChangeNotifier {
   List<ActiveTrip> get activeTrips => List.unmodifiable(_activeTrips);
   String? get tripsError => _tripsError;
 
-  // ════════════════════════════════════════════
-  // ACTIONS – DASHBOARD
-  // ════════════════════════════════════════════
-  /// GET /api/Staff/dashboard
   Future<void> loadDashboard({bool force = false}) async {
     if (_dashState == StaffLoadState.loaded && !force) return;
     _dashState = StaffLoadState.loading;
@@ -80,10 +68,6 @@ class StaffProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ════════════════════════════════════════════
-  // ACTIONS – PENDING BOOKINGS
-  // ════════════════════════════════════════════
-  /// GET /api/Staff/pending-bookings
   Future<void> loadPendingBookings({bool force = false}) async {
     if (_pendingState == StaffLoadState.loaded && !force) return;
     _pendingState = StaffLoadState.loading;
@@ -102,22 +86,15 @@ class StaffProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ════════════════════════════════════════════
-  // ACTIONS – APPROVE BOOKING
-  // ════════════════════════════════════════════
-  /// PUT /api/Staff/bookings/{id}/approve
-  /// Trả về true nếu thành công.
   Future<bool> approveBooking(int bookingId) async {
     _isActing = true;
     _actError = null;
     notifyListeners();
     try {
       await _service.approveBooking(bookingId);
-      // Xóa khỏi danh sách chờ (optimistic update)
       _pendingBookings.removeWhere((b) => (b['id'] as int?) == bookingId);
       _isActing = false;
       notifyListeners();
-      // Tự động làm mới dashboard + danh sách chờ để UI luôn đồng bộ
       loadDashboard(force: true);
       loadPendingBookings(force: true);
       return true;
@@ -134,22 +111,15 @@ class StaffProvider extends ChangeNotifier {
     }
   }
 
-  // ════════════════════════════════════════════
-  // ACTIONS – REJECT BOOKING
-  // ════════════════════════════════════════════
-  /// PUT /api/Staff/bookings/{id}/reject
-  /// Trả về true nếu thành công.
   Future<bool> rejectBooking(int bookingId, {String? reason}) async {
     _isActing = true;
     _actError = null;
     notifyListeners();
     try {
       await _service.rejectBooking(bookingId, reason: reason);
-      // Xóa khỏi danh sách chờ (optimistic update)
       _pendingBookings.removeWhere((b) => (b['id'] as int?) == bookingId);
       _isActing = false;
       notifyListeners();
-      // Tự động làm mới dashboard + danh sách chờ để UI luôn đồng bộ
       loadDashboard(force: true);
       loadPendingBookings(force: true);
       return true;
@@ -166,10 +136,6 @@ class StaffProvider extends ChangeNotifier {
     }
   }
 
-  // ════════════════════════════════════════════
-  // ACTIONS – PASSENGER STATS
-  // ════════════════════════════════════════════
-  /// GET /api/Staff/passenger-stats
   Future<void> loadPassengerStats({bool force = false}) async {
     if (_statsState == StaffLoadState.loaded && !force) return;
     _statsState = StaffLoadState.loading;
@@ -188,10 +154,6 @@ class StaffProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ════════════════════════════════════════════
-  // ACTIONS – ACTIVE TRIPS
-  // ════════════════════════════════════════════
-  /// GET /api/Staff/active-trips
   Future<void> loadActiveTrips({bool force = false}) async {
     if (_tripsState == StaffLoadState.loaded && !force) return;
     _tripsState = StaffLoadState.loading;
@@ -210,15 +172,11 @@ class StaffProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ════════════════════════════════════════════
-  // UTILITIES
-  // ════════════════════════════════════════════
   void clearActError() {
     _actError = null;
     notifyListeners();
   }
 
-  /// Refresh toàn bộ dữ liệu Staff
   void refreshAll() {
     loadDashboard(force: true);
     loadPendingBookings(force: true);

@@ -71,7 +71,6 @@ namespace VetauBackend.Controllers
         [HttpPost("lock-seat")]
         public async Task<IActionResult> LockSeat([FromBody] LockSeatRequest req)
         {
-            // Lấy SessionId từ header hoặc gen mới nếu khách chưa có
             if (!Request.Headers.TryGetValue("X-Session-Id", out var sessionId))
             {
                 sessionId = Guid.NewGuid().ToString();
@@ -90,9 +89,6 @@ namespace VetauBackend.Controllers
             return Ok(new { SessionId = sessionId.ToString(), Message = "Giữ chỗ thành công. Bạn có 15 phút để thanh toán." });
         }
 
-        /// <summary>
-        /// GET /api/Trips/stations — Public endpoint cho StationPicker (không cần auth)
-        /// </summary>
         [HttpGet("stations")]
         public async Task<IActionResult> GetStations()
         {
@@ -145,9 +141,6 @@ namespace VetauBackend.Controllers
             }
         }
 
-        /// <summary>
-        /// Khách hàng đã đăng nhập xem lịch sử vé của mình.
-        /// </summary>
         [HttpGet("my-bookings")]
         [Authorize(Roles = "customer,admin,staff")]
         public async Task<IActionResult> GetMyBookings()
@@ -161,10 +154,6 @@ namespace VetauBackend.Controllers
         }
     }
 
-    /// <summary>
-    /// AdminController — Chỉ admin mới truy cập được.
-    /// Staff KHÔNG có quyền CRUD ga tàu, tàu, hoặc xem toàn bộ bookings qua admin.
-    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "admin")]
@@ -184,7 +173,6 @@ namespace VetauBackend.Controllers
             return Ok(stats);
         }
 
-        // --- STATIONS ---
         [HttpGet("stations")]
         public async Task<IActionResult> GetStations()
         {
@@ -215,14 +203,12 @@ namespace VetauBackend.Controllers
             return Ok(new { Message = "Đã vô hiệu hóa ga tàu." });
         }
 
-        // --- TRAINS ---
         [HttpGet("trains")]
         public async Task<IActionResult> GetTrains()
         {
             return Ok(await _adminService.GetTrainsAsync());
         }
 
-        // --- BOOKINGS ---
         [HttpGet("bookings")]
         public async Task<IActionResult> GetBookings([FromQuery] int page = 1, [FromQuery] int pageSize = 50, [FromQuery] string? status = null, [FromQuery] string? search = null)
         {
@@ -230,10 +216,6 @@ namespace VetauBackend.Controllers
             return Ok(bookings);
         }
 
-        /// <summary>
-        /// PUT /api/Admin/bookings/{id}/status
-        /// FE gửi body: {"Status": "Confirmed"} hoặc {"Status": "Cancelled"}
-        /// </summary>
         [HttpPut("bookings/{id}/status")]
         public async Task<IActionResult> UpdateBookingStatus(int id, [FromBody] UpdateStatusRequest req)
         {
@@ -246,11 +228,6 @@ namespace VetauBackend.Controllers
         }
     }
 
-    /// <summary>
-    /// StaffController — Quản lý tầng giữa.
-    /// Staff và Admin đều truy cập được.
-    /// Chức năng: duyệt đơn vé, xem thống kê khách, xem chuyến đang chạy.
-    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "admin,staff")]
@@ -263,9 +240,6 @@ namespace VetauBackend.Controllers
             _staffService = staffService;
         }
 
-        /// <summary>
-        /// GET /api/Staff/dashboard — Dashboard tổng hợp cho staff
-        /// </summary>
         [HttpGet("dashboard")]
         public async Task<IActionResult> GetDashboard()
         {
@@ -273,9 +247,6 @@ namespace VetauBackend.Controllers
             return Ok(stats);
         }
 
-        /// <summary>
-        /// GET /api/Staff/pending-bookings — Danh sách đơn vé chờ duyệt
-        /// </summary>
         [HttpGet("pending-bookings")]
         public async Task<IActionResult> GetPendingBookings()
         {
@@ -283,9 +254,6 @@ namespace VetauBackend.Controllers
             return Ok(bookings);
         }
 
-        /// <summary>
-        /// PUT /api/Staff/bookings/{id}/approve — Duyệt đơn vé
-        /// </summary>
         [HttpPut("bookings/{id}/approve")]
         public async Task<IActionResult> ApproveBooking(int id)
         {
@@ -294,9 +262,6 @@ namespace VetauBackend.Controllers
             return Ok(new { Message = "Đã duyệt đơn vé thành công." });
         }
 
-        /// <summary>
-        /// PUT /api/Staff/bookings/{id}/reject — Từ chối đơn vé
-        /// </summary>
         [HttpPut("bookings/{id}/reject")]
         public async Task<IActionResult> RejectBooking(int id, [FromBody] RejectBookingRequest? req)
         {
@@ -305,9 +270,6 @@ namespace VetauBackend.Controllers
             return Ok(new { Message = "Đã từ chối đơn vé." });
         }
 
-        /// <summary>
-        /// GET /api/Staff/passenger-stats — Thống kê số khách hiện tại
-        /// </summary>
         [HttpGet("passenger-stats")]
         public async Task<IActionResult> GetPassengerStats()
         {
@@ -315,9 +277,6 @@ namespace VetauBackend.Controllers
             return Ok(stats);
         }
 
-        /// <summary>
-        /// GET /api/Staff/active-trips — Chuyến tàu đang di chuyển theo giờ
-        /// </summary>
         [HttpGet("active-trips")]
         public async Task<IActionResult> GetActiveTrips()
         {

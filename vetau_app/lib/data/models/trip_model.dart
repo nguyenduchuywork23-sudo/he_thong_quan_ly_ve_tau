@@ -1,22 +1,6 @@
-/// Trip Models – ánh xạ 1:1 từ C# Models/Entities.cs
-///
-/// C# classes được chuyển đổi:
-///   Trip            → [TripModel]
-///
-/// Response shape từ TripService.SearchTripsAsync() (anonymous object C#):
-///   TripSearchResult → [TripSearchResult]
 library;
 
-// ═══════════════════════════════════════════════
-// ENTITY MODEL
-// ═══════════════════════════════════════════════
 
-/// Ánh xạ từ class Trip trong Entities.cs
-///
-/// Lưu ý quan trọng:
-///   - [departureTime] và [arrivalTime] là String "HH:mm" (vd: "19:30"),
-///     KHÔNG phải DateTime – đúng với thiết kế BE.
-///   - [status]: "scheduled" | "delayed" | "cancelled"
 class TripModel {
   final int id;
   final int trainId;
@@ -71,7 +55,6 @@ class TripModel {
         'createdAt': createdAt.toIso8601String(),
       };
 
-  /// Thời gian di chuyển định dạng "Xh Ym"
   String get durationFormatted {
     final h = durationMinutes ~/ 60;
     final m = durationMinutes % 60;
@@ -81,21 +64,7 @@ class TripModel {
   }
 }
 
-// ═══════════════════════════════════════════════
-// RESPONSE SHAPE (từ anonymous object C# trong TripService.SearchTripsAsync)
-// ═══════════════════════════════════════════════
 
-/// Kết quả tìm kiếm chuyến tàu.
-/// Ánh xạ từ anonymous object bên trong TripService.SearchTripsAsync():
-/// ```csharp
-/// new {
-///   t.Id, t.DepartureDate, t.DepartureTime, t.ArrivalTime,
-///   TrainName = t.Train.Name, RouteName = t.Route.Name,
-///   BasePrice = t.BasePrice, FromStation = fromRs.Station.Name,
-///   ToStation = toRs.Station.Name,
-///   Distance = toRs.DistanceKm - fromRs.DistanceKm
-/// }
-/// ```
 class TripSearchResult {
   final int id;
   final DateTime departureDate;
@@ -150,8 +119,6 @@ class TripSearchResult {
         'distance': distance,
       };
 
-  /// Tính thời gian di chuyển dựa trên departureTime và arrivalTime.
-  /// Hỗ trợ trường hợp tàu qua đêm (arrivalTime có thể nhỏ hơn departureTime).
   String get durationFormatted {
     try {
       final depParts = departureTime.split(':');
@@ -160,7 +127,6 @@ class TripSearchResult {
           int.parse(depParts[0]) * 60 + int.parse(depParts[1]);
       int arrMinutes = int.parse(arrParts[0]) * 60 + int.parse(arrParts[1]);
 
-      // Nếu tàu qua đêm: thêm 24 giờ vào giờ đến
       if (arrMinutes <= depMinutes) arrMinutes += 24 * 60;
 
       final diff = arrMinutes - depMinutes;
@@ -175,10 +141,7 @@ class TripSearchResult {
   }
 }
 
-// ─────────────────────────────────────────────
 
-/// Station model đơn giản – dùng trong picker và hiển thị.
-/// Ánh xạ từ class Station trong Entities.cs.
 class StationModel {
   final int id;
   final String name;

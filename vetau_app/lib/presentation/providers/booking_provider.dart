@@ -1,10 +1,3 @@
-/// BookingProvider – State Management cho luồng đặt vé & thanh toán
-///
-/// Quản lý:
-///   1. Form hành khách    → [setPassengerField], [validateForm]
-///   2. Gọi POST /api/bookings → [submitBooking]
-///   3. Kết quả đặt vé     → [bookingResult] (bookingCode, qrCodeData)
-///   4. Lịch sử vé         → [savedBookings] (SharedPreferences)
 library;
 
 import 'package:flutter/foundation.dart';
@@ -17,21 +10,13 @@ import '../../data/services/booking_service.dart';
 import '../../core/network/dio_client.dart' hide debugPrint;
 import '../../core/constants/api_constants.dart';
 
-// ═══════════════════════════════════════════════
-// ENUMS
-// ═══════════════════════════════════════════════
 
 enum BookingSubmitState { idle, submitting, success, error }
 
-// ═══════════════════════════════════════════════
-// BOOKING PROVIDER
-// ═══════════════════════════════════════════════
 
 class BookingProvider extends ChangeNotifier {
   final BookingService _bookingService = BookingService();
 
-  // ─── Ngữ cảnh đặt vé (từ TripProvider) ──────
-  // Được set trước khi vào PassengerFormScreen
   TripSearchResult? _trip;
   SeatAvailability? _seat;
   CarriageWithSeats? _carriage;
@@ -39,7 +24,6 @@ class BookingProvider extends ChangeNotifier {
   int _toStationId = 0;
   String _sessionId = '';
 
-  // ─── Form hành khách ─────────────────────────
   String _passengerName = '';
   String _passengerIdCard = '';
   String _passengerPhone = '';
@@ -47,7 +31,6 @@ class BookingProvider extends ChangeNotifier {
   String _passengerType = 'adult';   // adult | child | elderly
   String _paymentMethod = 'qr_transfer';
 
-  // Validation errors cho từng field
   final Map<String, String?> _fieldErrors = {
     'passengerName': null,
     'passengerIdCard': null,
@@ -55,16 +38,13 @@ class BookingProvider extends ChangeNotifier {
     'passengerEmail': null,
   };
 
-  // ─── Submit State ─────────────────────────────
   BookingSubmitState _submitState = BookingSubmitState.idle;
   String? _submitError;
   CreateBookingResponse? _bookingResult;
 
-  // ─── Saved Bookings (My Tickets) ─────────────
   List<Map<String, dynamic>> _savedBookings = [];
   bool _isFetchingBookings = false;
 
-  // ─── Getters ──────────────────────────────────
   TripSearchResult? get trip => _trip;
   SeatAvailability? get seat => _seat;
   CarriageWithSeats? get carriage => _carriage;
@@ -89,11 +69,7 @@ class BookingProvider extends ChangeNotifier {
   List<Map<String, dynamic>> get savedBookings =>
       List.unmodifiable(_savedBookings);
 
-  // ═══════════════════════════════════════════════
-  // SETUP – Thiết lập ngữ cảnh trước khi mở form
-  // ═══════════════════════════════════════════════
 
-  /// Gọi từ SeatSelectionScreen sau khi user bấm "Tiếp tục"
   void setBookingContext({
     required TripSearchResult trip,
     required SeatAvailability seat,
@@ -109,14 +85,10 @@ class BookingProvider extends ChangeNotifier {
     _toStationId = toStationId;
     _sessionId = sessionId;
 
-    // Reset form & submit state
     _resetForm();
     notifyListeners();
   }
 
-  // ═══════════════════════════════════════════════
-  // FORM ACTIONS
-  // ═══════════════════════════════════════════════
 
   void setPassengerName(String value) {
     _passengerName = value;
@@ -152,14 +124,9 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ═══════════════════════════════════════════════
-  // VALIDATION – Tương ứng với [Required] annotations bên C#
-  // ═══════════════════════════════════════════════
 
-  /// Validate 1 field và cập nhật [_fieldErrors]
   void _validateField(String field, String value) {
     switch (field) {
-      // [Required, MaxLength(100)] PassengerName
       case 'passengerName':
         if (value.trim().isEmpty) {
           _fieldErrors[field] = 'Vui lòng nhập họ tên';
@@ -171,7 +138,6 @@ class BookingProvider extends ChangeNotifier {
           _fieldErrors[field] = null;
         }
 
-      // [Required, MaxLength(20)] PassengerIdCard
       case 'passengerIdCard':
         final digits = value.replaceAll(RegExp(r'\D'), '');
         if (digits.isEmpty) {
@@ -182,7 +148,6 @@ class BookingProvider extends ChangeNotifier {
           _fieldErrors[field] = null;
         }
 
-      // [Required, MaxLength(20)] PassengerPhone
       case 'passengerPhone':
         final digits = value.replaceAll(RegExp(r'\D'), '');
         if (digits.isEmpty) {
@@ -195,7 +160,6 @@ class BookingProvider extends ChangeNotifier {
           _fieldErrors[field] = null;
         }
 
-      // Optional – chỉ validate format nếu có nhập
       case 'passengerEmail':
         if (value.isEmpty) {
           _fieldErrors[field] = null; // Không bắt buộc
@@ -207,8 +171,6 @@ class BookingProvider extends ChangeNotifier {
     }
   }
 
-  /// Validate toàn bộ form trước khi submit.
-  /// Trả về true nếu không có lỗi.
   bool validateForm() {
     _validateField('passengerName', _passengerName);
     _validateField('passengerIdCard', _passengerIdCard);
@@ -218,18 +180,8 @@ class BookingProvider extends ChangeNotifier {
     return !hasErrors;
   }
 
-  // ═══════════════════════════════════════════════
-  // SUBMIT BOOKING
-  // Gọi POST /api/bookings
-  // ═══════════════════════════════════════════════
 
-  /// Xác nhận đặt vé:
-  ///   1. Validate form
-  ///   2. Gọi BookingService.createBooking()
-  ///   3. Lưu kết quả + persistBooking vào SharedPreferences
-  ///   4. Cập nhật state → UI điều hướng sang màn xác nhận
   Future<bool> submitBooking() async {
-    // Kiểm tra đủ context
     if (_trip == null || _seat == null || _carriage == null) {
       _submitError = 'Thông tin chuyến tàu không đầy đủ. Vui lòng quay lại.';
       _submitState = BookingSubmitState.error;
@@ -237,7 +189,6 @@ class BookingProvider extends ChangeNotifier {
       return false;
     }
 
-    // Validate form trước khi gửi
     if (!validateForm()) return false;
 
     _submitState = BookingSubmitState.submitting;
@@ -262,7 +213,6 @@ class BookingProvider extends ChangeNotifier {
       _bookingResult = await _bookingService.createBooking(request, _sessionId);
       _submitState = BookingSubmitState.success;
 
-      // Lưu vé vào local (My Tickets)
       await _persistBooking(_bookingResult!);
 
       notifyListeners();
@@ -280,11 +230,7 @@ class BookingProvider extends ChangeNotifier {
     }
   }
 
-  // ═══════════════════════════════════════════════
-  // MY TICKETS – Lưu local & Tải vé từ Server
-  // ═══════════════════════════════════════════════
 
-  /// Lưu booking result vào SharedPreferences
   Future<void> _persistBooking(CreateBookingResponse result) async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -307,19 +253,15 @@ class BookingProvider extends ChangeNotifier {
       'savedAt': DateTime.now().toIso8601String(),
     };
 
-    // Đọc danh sách cũ, thêm mới, lưu lại
     final existing = prefs.getStringList(ApiConstants.keyMyBookings) ?? [];
     existing.insert(0, jsonEncode(bookingEntry));
-    // Giữ tối đa 20 vé gần nhất
     if (existing.length > 20) existing.removeRange(20, existing.length);
     await prefs.setStringList(ApiConstants.keyMyBookings, existing);
 
-    // Cập nhật state in-memory
     _savedBookings.insert(0, bookingEntry);
     if (_savedBookings.length > 20) _savedBookings = _savedBookings.sublist(0, 20);
   }
 
-  /// Tải danh sách vé từ Server (nếu đã đăng nhập) hoặc SharedPreferences
   Future<void> loadSavedBookings() async {
     _isFetchingBookings = true;
     notifyListeners();
@@ -328,11 +270,8 @@ class BookingProvider extends ChangeNotifier {
     final token = prefs.getString(ApiConstants.keyJwtToken);
 
     if (token != null && token.isNotEmpty) {
-      // Đã đăng nhập -> Lấy từ BE
       try {
         final apiBookings = await _bookingService.getMyBookings();
-        // Cập nhật list với data từ server (Mapping properties from BE Model to our local map format if needed)
-        // BE trả về properties viết hoa: BookingCode, TrainName, DepartureDate...
         _savedBookings = apiBookings.map((b) {
           return {
             'bookingCode': b['bookingCode'] ?? b['BookingCode'] ?? '',
@@ -354,12 +293,10 @@ class BookingProvider extends ChangeNotifier {
         notifyListeners();
         return;
       } catch (e) {
-        // Fallback to local if API fails
         debugPrint('Lấy vé từ server thất bại, dùng local fallback: $e');
       }
     }
 
-    // Chưa đăng nhập hoặc lỗi API -> Load từ local storage
     final list = prefs.getStringList(ApiConstants.keyMyBookings) ?? [];
     _savedBookings = list.map((s) {
       try {
@@ -373,7 +310,6 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ─── Reset ────────────────────────────────────
   void _resetForm() {
     _passengerName = '';
     _passengerIdCard = '';

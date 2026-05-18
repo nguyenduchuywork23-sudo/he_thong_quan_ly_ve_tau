@@ -1,9 +1,3 @@
-/// TripProvider – State Management cho luồng tìm kiếm & chọn ghế
-///
-/// Quản lý 3 màn hình:
-///   1. Home Search  → [searchTrips]
-///   2. Seat Map     → [loadSeats], [selectSeat], [lockSelectedSeat]
-///   3. Seat status  → [SeatLockState] theo từng ghế
 library;
 
 import 'dart:async';
@@ -15,13 +9,9 @@ import '../../data/services/trip_service.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/constants/api_constants.dart';
 
-// ═══════════════════════════════════════════════
-// ENUM TRẠNG THÁI PROVIDER
-// ═══════════════════════════════════════════════
 
 enum TripLoadState { idle, loading, loaded, error }
 
-/// Trạng thái ghế từ góc nhìn của user hiện tại
 enum SeatLockState {
   idle,       // Chưa làm gì
   locking,    // Đang gọi POST /api/trips/lock-seat
@@ -29,44 +19,33 @@ enum SeatLockState {
   failed,     // Lock thất bại (ghế bị người khác lấy)
 }
 
-// ═══════════════════════════════════════════════
-// TRIP PROVIDER
-// ═══════════════════════════════════════════════
 
 class TripProvider extends ChangeNotifier {
   final TripService _tripService = TripService();
 
-  // ─── Search State ───────────────────────────────────
   TripLoadState _searchState = TripLoadState.idle;
   List<TripSearchResult> _searchResults = [];
   String? _searchError;
 
-  // Tham số tìm kiếm hiện tại (giữ lại để refresh)
   String? _lastFromCode;
   String? _lastToCode;
   DateTime? _lastDate;
 
-  // ─── Station State ─────────────────────────────────
   List<StationModel> _stations = [];
   TripLoadState _stationsState = TripLoadState.idle;
   String? _stationsError;
 
-  // ─── Selected Trip ────────────────────────────
   TripSearchResult? _selectedTrip;
 
-  // ─── Seats State ─────────────────────────────
   TripLoadState _seatsState = TripLoadState.idle;
   List<CarriageWithSeats> _carriages = [];
   String? _seatsError;
 
-  // Tab toa đang chọn (index)
   int _selectedCarriageIndex = 0;
 
-  // Ghế user đang chọn (trước khi lock)
   SeatAvailability? _selectedSeat;
   CarriageWithSeats? _selectedCarriage;
 
-  // ─── Seat Lock State ──────────────────────────
   SeatLockState _seatLockState = SeatLockState.idle;
   String? _lockError;
   DateTime? _lockExpiry;        // Thời điểm hết hạn giữ chỗ
@@ -74,10 +53,8 @@ class TripProvider extends ChangeNotifier {
   
   Timer? _lockTimer;
 
-  // Đếm ngược giữ chỗ
   int _lockRemainingSeconds = 0;
 
-  // ─── Getters ──────────────────────────────────────
   TripLoadState get searchState => _searchState;
   List<TripSearchResult> get searchResults => _searchResults;
   String? get searchError => _searchError;
@@ -115,14 +92,7 @@ class TripProvider extends ChangeNotifier {
   bool get isSeatLocked => _seatLockState == SeatLockState.locked;
   bool get isSeatLocking => _seatLockState == SeatLockState.locking;
 
-  // ═══════════════════════════════════════════════
-  // ACTIONS – TẢI DANH SÁCH GA TÀU
-  // Gọi GET /api/Trips/stations
-  // Chỉ thành công khi user đã login (JWT hợp lệ)
-  // Nếu 401 → _stationsState = error (UI hiển thị fallback text field)
-  // ═══════════════════════════════════════════════
   Future<void> loadStations() async {
-    // Không reload nếu đã tải thành công
     if (_stationsState == TripLoadState.loaded && _stations.isNotEmpty) return;
     _stationsState = TripLoadState.loading;
     notifyListeners();
@@ -139,11 +109,7 @@ class TripProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ═══════════════════════════════════════════════
-  // ACTIONS – TÌM KIẾM CHUYẾN
-  // ═══════════════════════════════════════════════
 
-  /// Gọi GET /api/trips/search
   Future<void> searchTrips({
     required String fromStationCode,
     required String toStationCode,
@@ -154,7 +120,6 @@ class TripProvider extends ChangeNotifier {
     _searchResults = [];
     notifyListeners();
 
-    // Lưu params để có thể refresh
     _lastFromCode = fromStationCode;
     _lastToCode = toStationCode;
     _lastDate = date;
@@ -177,10 +142,8 @@ class TripProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Chọn chuyến từ kết quả tìm kiếm → điều hướng sang màn Seat Map
   void selectTrip(TripSearchResult trip) {
     _selectedTrip = trip;
-    // Reset trạng thái seat cũ
     _carriages = [];
     _selectedSeat = null;
     _selectedCarriage = null;
@@ -192,11 +155,7 @@ class TripProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ═══════════════════════════════════════════════
-  // ACTIONS – SƠ ĐỒ GHẾ
-  // ═══════════════════════════════════════════════
 
-  /// Gọi GET /api/trips/{id}/seats
   Future<void> loadSeats(int tripId) async {
     _seatsState = TripLoadState.loading;
     _seatsError = null;
@@ -217,29 +176,23 @@ class TripProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Đổi tab toa đang xem
   void selectCarriageTab(int index) {
     if (index < 0 || index >= _carriages.length) return;
     _selectedCarriageIndex = index;
     notifyListeners();
   }
 
-  /// User tap vào 1 ghế trống → lưu ghế đang chọn (chưa lock)
-  /// Nếu tap lại ghế đã chọn → bỏ chọn
   void tapSeat(SeatAvailability seat, CarriageWithSeats carriage) {
     if (!seat.isAvailable) return; // Ghế đã đặt → bỏ qua
 
-    // Nếu ghế đang lock (đã confirm) → không cho đổi
     if (_seatLockState == SeatLockState.locked) return;
 
     if (_selectedSeat?.id == seat.id) {
-      // Tap lại → bỏ chọn
       _selectedSeat = null;
       _selectedCarriage = null;
     } else {
       _selectedSeat = seat;
       _selectedCarriage = carriage;
-      // Reset lock state cũ nếu có
       if (_seatLockState == SeatLockState.failed) {
         _seatLockState = SeatLockState.idle;
         _lockError = null;
@@ -248,14 +201,7 @@ class TripProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ═══════════════════════════════════════════════
-  // ACTIONS – LOCK SEAT
-  // Gọi POST /api/trips/lock-seat
-  // X-Session-Id được SessionInterceptor tự đính kèm
-  // ═══════════════════════════════════════════════
 
-  /// Giữ ghế đang được chọn.
-  /// Trả về true nếu lock thành công, false nếu thất bại.
   Future<bool> lockSelectedSeat() async {
     if (_selectedSeat == null || _selectedTrip == null) return false;
 
@@ -274,10 +220,8 @@ class TripProvider extends ChangeNotifier {
         const Duration(minutes: ApiConstants.seatLockMinutes),
       );
 
-      // Cập nhật trạng thái ghế trong danh sách cục bộ
       _markSeatAsUnavailable(_selectedSeat!.id);
 
-      // Bắt đầu đếm ngược
       _startCountdown();
 
       notifyListeners();
@@ -295,8 +239,6 @@ class TripProvider extends ChangeNotifier {
     }
   }
 
-  /// Đánh dấu ghế trong danh sách cục bộ là unavailable
-  /// (để UI cập nhật ngay mà không cần reload)
   void _markSeatAsUnavailable(int seatId) {
     _carriages = _carriages.map((carriage) {
       final updatedSeats = carriage.seats.map((seat) {
@@ -312,7 +254,6 @@ class TripProvider extends ChangeNotifier {
     }).toList();
   }
 
-  /// Đếm ngược 15 phút giữ chỗ
   void _startCountdown() {
     _lockRemainingSeconds = ApiConstants.seatLockMinutes * 60;
     _lockTimer?.cancel();
@@ -323,7 +264,6 @@ class TripProvider extends ChangeNotifier {
         return;
       }
       if (_lockRemainingSeconds <= 0) {
-        // Hết giờ giữ chỗ → reset
         _seatLockState = SeatLockState.idle;
         _selectedSeat = null;
         _selectedCarriage = null;
@@ -337,14 +277,12 @@ class TripProvider extends ChangeNotifier {
     });
   }
 
-  /// Format countdown "MM:SS"
   String get lockCountdownFormatted {
     final m = _lockRemainingSeconds ~/ 60;
     final s = _lockRemainingSeconds % 60;
     return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
-  // ─── Reset ────────────────────────────────────
   void resetSearch() {
     _searchState = TripLoadState.idle;
     _searchResults = [];

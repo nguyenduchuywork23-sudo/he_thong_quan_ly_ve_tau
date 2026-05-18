@@ -1,4 +1,3 @@
-/// PassengerFormScreen – Form nhập thông tin hành khách
 library;
 
 import 'package:flutter/material.dart';
@@ -34,7 +33,6 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
   }
 
   Future<void> _submit() async {
-    // Unfocus tất cả
     FocusScope.of(context).unfocus();
     final bp = context.read<BookingProvider>();
     if (!bp.validateForm()) return;
@@ -82,20 +80,16 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                  // ── Tóm tắt chuyến ──────────────
                   _TripSummaryCard(bp: bp, tp: tp),
                   const SizedBox(height: AppTheme.spacingM),
 
-                  // ── Loại hành khách ──────────────
                   _SectionTitle('Loại hành khách'),
                   _PassengerTypeSelector(bp: bp),
                   const SizedBox(height: AppTheme.spacingM),
 
-                  // ── Thông tin cá nhân ─────────────
                   _SectionTitle('Thông tin hành khách'),
                   const SizedBox(height: 8),
 
-                  // Họ tên
                   _FormField(
                     label: 'Họ và tên *',
                     hint: 'Nhập họ tên đầy đủ',
@@ -109,7 +103,6 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // CCCD
                   _FormField(
                     label: 'Số CMND / CCCD *',
                     hint: '9 hoặc 12 chữ số',
@@ -126,7 +119,6 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // SĐT
                   _FormField(
                     label: 'Số điện thoại *',
                     hint: '0xxxxxxxxx (10 số)',
@@ -143,7 +135,6 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Email
                   _FormField(
                     label: 'Email (không bắt buộc)',
                     hint: 'example@email.com',
@@ -156,17 +147,14 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                   ),
                   const SizedBox(height: AppTheme.spacingM),
 
-                  // ── Phương thức thanh toán ────────
                   _SectionTitle('Phương thức thanh toán'),
                   const SizedBox(height: 8),
                   _PaymentMethodCard(bp: bp),
                   const SizedBox(height: AppTheme.spacingM),
 
-                  // ── Tổng tiền ────────────────────
                   _PriceSummary(bp: bp),
                   const SizedBox(height: AppTheme.spacingL),
 
-                  // ── Submit button ─────────────────
                   Container(
                     decoration: BoxDecoration(
                       gradient: AppTheme.primaryGradient,
@@ -193,7 +181,6 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
           ),
         ),
       ),
-      // Loading overlay
       if (bp.isSubmitting)
             Container(
               color: Colors.black54,
@@ -212,7 +199,6 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
   }
 }
 
-// ── Trip summary card ─────────────────────────
 class _TripSummaryCard extends StatelessWidget {
   final BookingProvider bp;
   final TripProvider tp;
@@ -277,7 +263,6 @@ class _TripSummaryCard extends StatelessWidget {
                 'Toa ${carriage.carriageNumber} – ${carriage.displayName.split('\n').last}'),
         ]),
         const SizedBox(height: 8),
-        // Countdown nếu đang trong thời gian giữ chỗ
         if (tp.isSeatLocked)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -321,7 +306,6 @@ class _InfoPill extends StatelessWidget {
   );
 }
 
-// ── Passenger type selector ───────────────────
 class _PassengerTypeSelector extends StatelessWidget {
   final BookingProvider bp;
   const _PassengerTypeSelector({required this.bp});
@@ -364,7 +348,6 @@ class _PassengerTypeSelector extends StatelessWidget {
   }
 }
 
-// ── Form field ───────────────────────────────
 class _FormField extends StatelessWidget {
   final String label, hint;
   final IconData icon;
@@ -432,7 +415,6 @@ class _FormField extends StatelessWidget {
   }
 }
 
-// ── Payment method ───────────────────────────
 class _PaymentMethodCard extends StatelessWidget {
   final BookingProvider bp;
   const _PaymentMethodCard({required this.bp});
@@ -465,7 +447,6 @@ class _PaymentMethodCard extends StatelessWidget {
   }
 }
 
-// ── Price summary ─────────────────────────────
 class _PriceSummary extends StatelessWidget {
   final BookingProvider bp;
   const _PriceSummary({required this.bp});
@@ -514,7 +495,6 @@ class _PriceRow extends StatelessWidget {
   );
 }
 
-// ── Section title ─────────────────────────────
 class _SectionTitle extends StatelessWidget {
   final String title;
   const _SectionTitle(this.title);

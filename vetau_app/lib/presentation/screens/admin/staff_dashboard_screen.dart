@@ -1,5 +1,3 @@
-/// StaffDashboardScreen – Dashboard thống kê dành cho Nhân viên
-/// Gọi GET /api/Staff/dashboard (StaffProvider)
 library;
 
 import 'package:flutter/material.dart';
@@ -67,11 +65,9 @@ class _StaffDashboardScreenState extends State<StaffDashboardScreen> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // ── Pending bookings highlight ──────────
         _PendingHighlightCard(pendingCount: stats.pendingBookings),
         const SizedBox(height: 16),
 
-        // ── Booking stats grid ──────────────────
         _sectionHeader('Thống kê vé hôm nay'),
         const SizedBox(height: 10),
         GridView.count(
@@ -111,7 +107,6 @@ class _StaffDashboardScreenState extends State<StaffDashboardScreen> {
         ),
         const SizedBox(height: 16),
 
-        // ── Passenger & Revenue ─────────────────
         _sectionHeader('Hành khách & Doanh thu hôm nay'),
         const SizedBox(height: 10),
         Row(children: [
@@ -144,7 +139,6 @@ class _StaffDashboardScreenState extends State<StaffDashboardScreen> {
   ]);
 }
 
-// ── Pending highlight card ────────────────────
 class _PendingHighlightCard extends StatelessWidget {
   final int pendingCount;
   const _PendingHighlightCard({required this.pendingCount});
@@ -198,7 +192,6 @@ class _PendingHighlightCard extends StatelessWidget {
   }
 }
 
-// ── Stat card ─────────────────────────────────
 class _StatCard extends StatelessWidget {
   final String label, value;
   final IconData icon;

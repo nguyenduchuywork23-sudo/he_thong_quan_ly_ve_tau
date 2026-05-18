@@ -1,10 +1,5 @@
-/// Admin Models – ánh xạ từ response của AdminController
 library;
 
-// ══════════════════════════════════════════════
-// DASHBOARD STATS
-// Ánh xạ từ GET /api/admin/dashboard
-// ══════════════════════════════════════════════
 class DashboardStats {
   final int totalBookings;
   final int pendingBookings;
@@ -55,10 +50,6 @@ class DashboardStats {
       s[0].toUpperCase() + s.substring(1);
 }
 
-// ══════════════════════════════════════════════
-// ADMIN BOOKING
-// Ánh xạ từ GET /api/admin/bookings
-// ══════════════════════════════════════════════
 class AdminBooking {
   final int id;
   final String bookingCode;
@@ -73,7 +64,6 @@ class AdminBooking {
   final DateTime createdAt;
   final DateTime? paymentDeadline;
   final String? qrCodeData;
-  // Trip info
   final String trainName;
   final String fromStation;
   final String toStation;
@@ -154,10 +144,6 @@ class AdminBooking {
   bool get isCancelled => status.toLowerCase() == 'cancelled';
 }
 
-// ══════════════════════════════════════════════
-// UPDATE STATUS REQUEST
-// Body for PUT /api/admin/bookings/{id}/status
-// ══════════════════════════════════════════════
 class UpdateBookingStatusRequest {
   final String status;
   const UpdateBookingStatusRequest({required this.status});

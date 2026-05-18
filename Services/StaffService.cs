@@ -27,9 +27,6 @@ namespace VetauBackend.Services
             _context = context;
         }
 
-        /// <summary>
-        /// Lấy danh sách đơn vé chờ duyệt (status = "pending") — flat DTO
-        /// </summary>
         public async Task<object> GetPendingBookingsAsync()
         {
             var bookings = await _context.Bookings
@@ -70,9 +67,6 @@ namespace VetauBackend.Services
             }).ToList();
         }
 
-        /// <summary>
-        /// Duyệt đơn vé → chuyển status "pending" → "confirmed"
-        /// </summary>
         public async Task<bool> ApproveBookingAsync(int id)
         {
             var booking = await _context.Bookings.FindAsync(id);
@@ -85,9 +79,6 @@ namespace VetauBackend.Services
             return true;
         }
 
-        /// <summary>
-        /// Từ chối đơn vé → chuyển status sang "rejected"
-        /// </summary>
         public async Task<bool> RejectBookingAsync(int id, string? reason)
         {
             var booking = await _context.Bookings.FindAsync(id);
@@ -99,12 +90,6 @@ namespace VetauBackend.Services
             return true;
         }
 
-        /// <summary>
-        /// Thống kê số khách hiện tại:
-        /// - Tổng khách có booking hôm nay
-        /// - Số khách trên tàu (chuyến đang chạy)
-        /// - Số khách đang chờ (chuyến chưa khởi hành)
-        /// </summary>
         public async Task<object> GetPassengerStatsAsync()
         {
             var today = DateTime.UtcNow.Date;
@@ -149,11 +134,6 @@ namespace VetauBackend.Services
             };
         }
 
-        /// <summary>
-        /// Danh sách chuyến tàu đang di chuyển theo giờ hiện tại.
-        /// Chuyến "đang chạy" = DepartureDate là hôm nay + Status = "scheduled"
-        /// + giờ hiện tại >= DepartureTime
-        /// </summary>
         public async Task<object> GetActiveTripsAsync()
         {
             var now = DateTime.UtcNow;
@@ -166,7 +146,6 @@ namespace VetauBackend.Services
                 .Where(t => t.Status == "scheduled" && t.DepartureDate.Date == today)
                 .ToListAsync();
 
-            // Tính số khách đã confirmed cho mỗi chuyến
             var tripIds = trips.Select(t => t.Id).ToList();
             var passengerCounts = await _context.Bookings
                 .Where(b => tripIds.Contains(b.TripId) && (b.Status == "confirmed" || b.Status == "pending"))
@@ -175,7 +154,6 @@ namespace VetauBackend.Services
                 .ToListAsync();
             var countDict = passengerCounts.ToDictionary(x => x.TripId, x => x.Count);
 
-            // Phân loại: đã khởi hành (giờ hiện tại >= departure) vs chưa khởi hành
             var result = trips.Select(t =>
             {
                 var isDeparted = string.Compare(currentTime, t.DepartureTime, StringComparison.Ordinal) >= 0;
@@ -206,9 +184,6 @@ namespace VetauBackend.Services
             return result;
         }
 
-        /// <summary>
-        /// Dashboard tổng hợp nhanh cho Staff
-        /// </summary>
         public async Task<object> GetStaffDashboardAsync()
         {
             var today = DateTime.UtcNow.Date;

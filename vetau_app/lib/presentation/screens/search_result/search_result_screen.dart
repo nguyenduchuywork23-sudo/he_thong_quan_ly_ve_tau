@@ -1,7 +1,3 @@
-/// SearchResultScreen – Danh sách kết quả chuyến tàu
-///
-/// Đọc dữ liệu từ TripProvider (đã gọi API ở HomeScreen).
-/// Xử lý 4 trạng thái: loading, error, empty, loaded.
 library;
 
 import 'package:flutter/material.dart';
@@ -31,10 +27,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
         builder: (ctx, tp, _) {
           return CustomScrollView(
             slivers: [
-              // ── SliverAppBar ─────────────────────
               _buildAppBar(tp),
 
-              // ── Filter Bar ───────────────────────
               SliverPersistentHeader(
                 pinned: true,
                 delegate: _FilterBarDelegate(
@@ -44,7 +38,6 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                 ),
               ),
 
-              // ── Content ──────────────────────────
               if (tp.isSearchLoading)
                 _buildShimmerSliver()
               else if (tp.searchState == TripLoadState.error)
@@ -70,7 +63,6 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
     );
   }
 
-  // ── SliverAppBar với route info ──────────────
   SliverAppBar _buildAppBar(TripProvider tp) {
     final from = tp.lastFromCode ?? '---';
     final to = tp.lastToCode ?? '---';
@@ -129,7 +121,6 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
     );
   }
 
-  // ── Shimmer loading ──────────────────────────
   Widget _buildShimmerSliver() {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
@@ -139,7 +130,6 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
     );
   }
 
-  // ── Error state ──────────────────────────────
   Widget _buildErrorSliver(String msg, VoidCallback onRetry) {
     return SliverFillRemaining(
       child: Center(
@@ -170,7 +160,6 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
     );
   }
 
-  // ── Empty state ──────────────────────────────
   Widget _buildEmptySliver() {
     return SliverFillRemaining(
       child: Center(
@@ -204,14 +193,11 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
     );
   }
 
-  // ── Results list ─────────────────────────────
   Widget _buildResultsSliver(TripProvider tp) {
-    // Sắp xếp theo mode
     final sorted = [...tp.searchResults];
     if (_sortMode == _SortMode.price) {
       sorted.sort((a, b) => a.basePrice.compareTo(b.basePrice));
     } else {
-      // Sort by departure time (HH:mm string)
       sorted.sort((a, b) => a.departureTime.compareTo(b.departureTime));
     }
 
@@ -230,9 +216,6 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
   }
 }
 
-// ═══════════════════════════════════════════════
-// FILTER BAR
-// ═══════════════════════════════════════════════
 
 enum _SortMode { departureTime, price }
 
@@ -318,9 +301,6 @@ class _SortChip extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════
-// SHIMMER CARD (loading skeleton)
-// ═══════════════════════════════════════════════
 
 class _ShimmerCard extends StatelessWidget {
   @override

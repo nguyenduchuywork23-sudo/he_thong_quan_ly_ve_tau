@@ -1,5 +1,3 @@
-/// StaffActiveTripsScreen – Chuyến tàu đang hoạt động
-/// GET /api/Staff/active-trips (StaffProvider)
 library;
 
 import 'package:flutter/material.dart';

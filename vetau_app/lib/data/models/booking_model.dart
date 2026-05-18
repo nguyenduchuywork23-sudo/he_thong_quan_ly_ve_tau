@@ -1,18 +1,6 @@
-/// Booking Models – DTOs & Response shapes liên quan đến đặt vé
-///
-/// Ánh xạ từ:
-///   DTOs/Models.cs → [LockSeatRequest], [CreateBookingRequest]
-///   Models/Entities.cs → [BookingModel]
-///   Controllers: response anonymous objects từ BookingsController
 library;
 
-// ═══════════════════════════════════════════════
-// REQUEST DTOs (gửi lên BE)
-// ═══════════════════════════════════════════════
 
-/// Ánh xạ từ class LockSeatRequest trong DTOs/Models.cs
-/// Gửi lên: POST /api/trips/lock-seat
-/// Header bắt buộc: X-Session-Id (do SessionInterceptor tự đính kèm)
 class LockSeatRequest {
   final int seatId;
   final int tripId;
@@ -28,16 +16,7 @@ class LockSeatRequest {
       };
 }
 
-// ─────────────────────────────────────────────
 
-/// Ánh xạ từ class CreateBookingRequest trong DTOs/Models.cs
-/// Gửi lên: POST /api/bookings
-/// Header bắt buộc: X-Session-Id (do SessionInterceptor tự đính kèm)
-///
-/// [Required] fields từ C# → KHÔNG được null trong Dart:
-///   passengerName, passengerIdCard, passengerPhone
-/// Nullable fields từ C# (string?) → nullable String? trong Dart:
-///   passengerEmail
 class CreateBookingRequest {
   final int tripId;
   final int fromStationId;
@@ -45,15 +24,12 @@ class CreateBookingRequest {
   final int seatId;
   final int carriageId;
 
-  // [Required] – bắt buộc nhập (validate ở UI trước khi gọi API)
   final String passengerName;
   final String passengerIdCard;
   final String passengerPhone;
 
-  // Optional – có thể null
   final String? passengerEmail;
 
-  // Default values – khớp với default của BE
   final String passengerType;   // "adult" | "child" | "elderly"
   final String paymentMethod;   // "qr_transfer" (mặc định BE)
 
@@ -86,14 +62,7 @@ class CreateBookingRequest {
       };
 }
 
-// ═══════════════════════════════════════════════
-// RESPONSE DTOs (nhận từ BE)
-// ═══════════════════════════════════════════════
 
-/// Response từ POST /api/trips/lock-seat (OK 200)
-/// ```csharp
-/// return Ok(new { SessionId = ..., Message = "Giữ chỗ thành công..." });
-/// ```
 class LockSeatResponse {
   final String sessionId;
   final String message;
@@ -105,21 +74,13 @@ class LockSeatResponse {
 
   factory LockSeatResponse.fromJson(Map<String, dynamic> json) {
     return LockSeatResponse(
-      // BE trả về "SessionId" (PascalCase)
       sessionId: json['SessionId'] as String? ?? json['sessionId'] as String? ?? '',
       message: json['Message'] as String? ?? json['message'] as String? ?? '',
     );
   }
 }
 
-// ─────────────────────────────────────────────
 
-/// Response từ POST /api/bookings (OK 200)
-/// ```csharp
-/// return Ok(new {
-///   Message, BookingCode, FinalPrice, PaymentDeadline, QrCodeData
-/// });
-/// ```
 class CreateBookingResponse {
   final String message;
   final String bookingCode;
@@ -150,14 +111,7 @@ class CreateBookingResponse {
   }
 }
 
-// ═══════════════════════════════════════════════
-// ENTITY MODEL – BookingModel
-// Ánh xạ từ class Booking trong Entities.cs
-// Dùng cho màn hình My Tickets và Admin Bookings
-// ═══════════════════════════════════════════════
 
-/// Ánh xạ đầy đủ từ class Booking trong Models/Entities.cs
-/// Tất cả nullable field của C# (int?, DateTime?, string?) → nullable trong Dart
 class BookingModel {
   final int id;
   final String bookingCode;
@@ -166,24 +120,20 @@ class BookingModel {
   final int fromStationId;
   final int toStationId;
 
-  // Thông tin hành khách
   final String passengerName;
   final String passengerIdCard;
   final String passengerPhone;
   final String? passengerEmail;
   final String passengerType;  // adult | child | elderly
 
-  // Ghế & toa
   final int seatId;
   final int carriageId;
 
-  // Giá
   final double basePrice;
   final double discountPercent;
   final double discountAmount;
   final double finalPrice;
 
-  // Trạng thái
   final String status;         // pending | confirmed | cancelled
   final String paymentMethod;  // qr_transfer | ...
   final DateTime? paymentDeadline;
@@ -281,7 +231,6 @@ class BookingModel {
         'updatedAt': updatedAt.toIso8601String(),
       };
 
-  /// Nhãn trạng thái hiển thị tiếng Việt
   String get statusLabel => switch (status) {
         'pending' => 'Chờ thanh toán',
         'confirmed' => 'Đã xác nhận',
@@ -289,7 +238,6 @@ class BookingModel {
         _ => status,
       };
 
-  /// Còn trong thời gian giữ chỗ không?
   bool get isWithinDeadline =>
       paymentDeadline != null &&
       DateTime.now().isBefore(paymentDeadline!);

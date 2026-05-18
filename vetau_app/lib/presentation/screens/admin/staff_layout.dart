@@ -1,7 +1,3 @@
-/// StaffLayout – Khung điều hướng dành cho Nhân viên (Staff)
-///
-/// BottomNavigationBar: Dashboard | Chờ duyệt | Chuyến đang chạy | Hành khách
-/// Chỉ gọi /api/Staff/* — không động vào /api/Admin/*
 library;
 
 import 'package:flutter/material.dart';
@@ -47,7 +43,6 @@ class _StaffLayoutState extends State<StaffLayout> {
       StaffActiveTripsScreen(),
       StaffPassengerStatsScreen(),
     ];
-    // Preload dữ liệu khi layout khởi tạo
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final sp = context.read<StaffProvider>();
       sp.loadDashboard();
@@ -63,7 +58,6 @@ class _StaffLayoutState extends State<StaffLayout> {
     return Scaffold(
       backgroundColor: AppTheme.background,
 
-      // ── Staff AppBar (teal/green tone để phân biệt với Admin) ──────
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: Container(
@@ -74,7 +68,6 @@ class _StaffLayoutState extends State<StaffLayout> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(children: [
-                // Staff badge
                 Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8, vertical: 3),
@@ -93,7 +86,6 @@ class _StaffLayoutState extends State<StaffLayout> {
                         fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
                 const Spacer(),
 
-                // User info
                 if (user != null) ...[
                   Column(crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -107,7 +99,6 @@ class _StaffLayoutState extends State<StaffLayout> {
                   const SizedBox(width: 10),
                 ],
 
-                // Refresh + Menu
                 IconButton(
                   icon: const Icon(Icons.refresh,
                       color: AppTheme.textSecondary, size: 20),
@@ -154,13 +145,11 @@ class _StaffLayoutState extends State<StaffLayout> {
         ),
       ),
 
-      // ── Content ────────────────────────────────
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
       ),
 
-      // ── Bottom Navigation ───────────────────────
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppTheme.surface,

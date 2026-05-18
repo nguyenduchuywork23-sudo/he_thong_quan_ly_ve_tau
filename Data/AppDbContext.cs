@@ -26,7 +26,6 @@ namespace VetauBackend.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Unique constraints
             modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
             modelBuilder.Entity<Station>().HasIndex(s => s.Code).IsUnique();
             modelBuilder.Entity<VetauBackend.Models.Route>().HasIndex(r => r.Code).IsUnique();
@@ -51,7 +50,6 @@ namespace VetauBackend.Data
                 
             modelBuilder.Entity<PriceMultiplier>().HasIndex(p => p.CarriageType).IsUnique();
 
-            // Bookings foreign keys (prevent cascade delete loops)
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.FromStation)
                 .WithMany()

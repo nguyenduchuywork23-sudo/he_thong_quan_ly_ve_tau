@@ -8,7 +8,6 @@ using VetauBackend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -18,7 +17,6 @@ builder.Services.AddControllers()
     });
 builder.Services.AddEndpointsApiExplorer();
 
-// Swagger Config with JWT Support
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "VetauBackend API", Version = "v1" });
@@ -42,12 +40,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// DbContext configuration (MySQL Pomelo)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Dependency Injection
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ITripService, TripService>();
@@ -55,10 +51,8 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IStaffService, StaffService>();
 
-// Hosted Background Service
 builder.Services.AddHostedService<SeatLockCleanupService>();
 
-// JWT Authentication
 var jwtSecret = builder.Configuration["JwtSettings:Secret"] ?? "2f913d7e6c4a8b5024a19c5b8e97f06d";
 var key = Encoding.ASCII.GetBytes(jwtSecret);
 
@@ -81,7 +75,6 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -95,14 +88,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Auto seed DB on startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
-        // context.Database.EnsureCreated(); // Hoặc Migrate
         SeedData.Initialize(context);
     }
     catch (Exception ex)
@@ -115,7 +106,6 @@ using (var scope = app.Services.CreateScope())
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
 app.UseAuthentication();

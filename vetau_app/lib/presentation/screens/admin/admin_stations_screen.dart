@@ -1,4 +1,3 @@
-/// AdminStationsScreen – Quản lý Ga tàu (Full CRUD)
 library;
 
 import 'package:flutter/material.dart';
@@ -24,7 +23,6 @@ class _AdminStationsScreenState extends State<AdminStationsScreen> {
     });
   }
 
-  // ── Show station form (create or edit) ───────
   Future<void> _showForm(BuildContext ctx, {StationModel? station}) async {
     await showModalBottomSheet(
       context: ctx,
@@ -58,7 +56,6 @@ class _AdminStationsScreenState extends State<AdminStationsScreen> {
     );
   }
 
-  // ── Show delete confirmation dialog ──────────
   Future<void> _confirmDelete(BuildContext ctx, StationModel station) async {
     final confirm = await showDialog<bool>(
       context: ctx,
@@ -183,9 +180,6 @@ class _AdminStationsScreenState extends State<AdminStationsScreen> {
   }
 }
 
-// ══════════════════════════════════════════════
-// STATION TILE
-// ══════════════════════════════════════════════
 class _StationTile extends StatelessWidget {
   final StationModel station;
   final VoidCallback onEdit, onDelete;
@@ -281,9 +275,6 @@ class _StationTile extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════
-// STATION FORM BOTTOM SHEET (Create & Edit)
-// ══════════════════════════════════════════════
 typedef StationFormCallback = Future<void> Function(
     String name, String code, String? city,
     String? province, int sortOrder, bool isActive);
@@ -366,7 +357,6 @@ class _StationFormSheetState extends State<_StationFormSheet> {
       padding: EdgeInsets.fromLTRB(20, 12, 20,
           20 + MediaQuery.of(context).viewInsets.bottom),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        // Handle
         Container(width: 40, height: 4,
           decoration: BoxDecoration(color: AppTheme.cardBorder,
               borderRadius: BorderRadius.circular(2))),
@@ -377,14 +367,12 @@ class _StationFormSheetState extends State<_StationFormSheet> {
                 fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
         const SizedBox(height: 20),
 
-        // Tên ga
         _Field(ctrl: _nameCtrl, label: 'Tên ga *',
             hint: 'VD: Ga Hà Nội', icon: Icons.location_on_outlined,
             errorText: _nameErr,
             onChanged: (_) => setState(() => _nameErr = null)),
         const SizedBox(height: 12),
 
-        // Mã ga + Thứ tự
         Row(children: [
           Expanded(child: _Field(
             ctrl: _codeCtrl, label: 'Mã ga *',
@@ -406,17 +394,14 @@ class _StationFormSheetState extends State<_StationFormSheet> {
         ]),
         const SizedBox(height: 12),
 
-        // Thành phố
         _Field(ctrl: _cityCtrl, label: 'Thành phố',
             hint: 'VD: Hà Nội', icon: Icons.location_city_outlined),
         const SizedBox(height: 12),
 
-        // Tỉnh
         _Field(ctrl: _provinceCtrl, label: 'Tỉnh/Tỉnh thành',
             hint: 'VD: Hà Nội', icon: Icons.map_outlined),
         const SizedBox(height: 12),
 
-        // Active switch
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
@@ -440,7 +425,6 @@ class _StationFormSheetState extends State<_StationFormSheet> {
         ),
         const SizedBox(height: 20),
 
-        // Submit
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
@@ -462,7 +446,6 @@ class _StationFormSheetState extends State<_StationFormSheet> {
   }
 }
 
-// ── Compact form field ─────────────────────────
 class _Field extends StatelessWidget {
   final TextEditingController ctrl;
   final String label, hint;

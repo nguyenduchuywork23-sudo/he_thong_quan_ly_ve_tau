@@ -1,4 +1,3 @@
-/// TripCard – Card hiển thị 1 chuyến tàu trong kết quả tìm kiếm (Ocean Theme)
 library;
 
 import 'package:flutter/material.dart';
@@ -21,7 +20,6 @@ class TripCard extends StatefulWidget {
 }
 
 class _TripCardState extends State<TripCard> {
-  // Fade-in khi card mới xuất hiện
   double _opacity = 0.0;
 
   @override
@@ -63,7 +61,6 @@ class _TripCardState extends State<TripCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Row 1: Tên tàu + Loại tàu badge ──────────
                   Row(
                     children: [
                       Container(
@@ -91,11 +88,9 @@ class _TripCardState extends State<TripCard> {
 
                   const SizedBox(height: AppTheme.spacingM),
 
-                  // ── Row 2: Giờ đi ─── Duration ─── Giờ đến ───
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Giờ đi
                       Expanded(
                         flex: 3,
                         child: Column(
@@ -120,7 +115,6 @@ class _TripCardState extends State<TripCard> {
                         ),
                       ),
 
-                      // Duration line
                       Expanded(
                         flex: 4,
                         child: Padding(
@@ -155,7 +149,6 @@ class _TripCardState extends State<TripCard> {
                         ),
                       ),
 
-                      // Giờ đến
                       Expanded(
                         flex: 3,
                         child: Column(
@@ -190,10 +183,8 @@ class _TripCardState extends State<TripCard> {
                   ),
                   const SizedBox(height: AppTheme.spacingM),
 
-                  // ── Row 3: Khoảng cách + Giá + Nút Chọn ──────
                   Row(
                     children: [
-                      // Distance & Route
                       Expanded(
                         child: Wrap(
                           spacing: 6,
@@ -211,7 +202,6 @@ class _TripCardState extends State<TripCard> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      // Giá từ
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Column(
@@ -232,7 +222,6 @@ class _TripCardState extends State<TripCard> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      // Nút chọn
                       ElevatedButton(
                         onPressed: widget.onSelect,
                         style: ElevatedButton.styleFrom(
@@ -257,7 +246,6 @@ class _TripCardState extends State<TripCard> {
   }
 }
 
-// ─── Badge loại tàu ──────────────────────────
 
 class _TrainTypeBadge extends StatelessWidget {
   final String trainName;
@@ -265,7 +253,6 @@ class _TrainTypeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // SE = express, SPT = local
     final isExpress = trainName.toUpperCase().startsWith('SE');
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -289,7 +276,6 @@ class _TrainTypeBadge extends StatelessWidget {
   }
 }
 
-// ─── Info chip nhỏ ───────────────────────────
 
 class _InfoChip extends StatelessWidget {
   final IconData icon;

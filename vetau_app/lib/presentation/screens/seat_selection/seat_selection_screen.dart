@@ -1,4 +1,3 @@
-/// SeatSelectionScreen – Sơ đồ ghế tàu
 library;
 
 import 'package:flutter/material.dart';
@@ -102,7 +101,6 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
   @override
   Widget build(BuildContext context) {
     return Consumer<TripProvider>(builder: (ctx, tp, _) {
-      // Sync tabs khi carriages load xong
       if (tp.seatsState == TripLoadState.loaded && tp.carriages.length != _tabCount) {
         WidgetsBinding.instance.addPostFrameCallback(
             (_) => _initTabs(tp.carriages.length));
@@ -112,16 +110,13 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
         backgroundColor: AppTheme.background,
         appBar: _buildAppBar(tp),
         body: Column(children: [
-          // Tab bar
           if (tp.seatsState == TripLoadState.loaded &&
               _tabController != null &&
               tp.carriages.isNotEmpty)
             _buildTabBar(tp),
 
-          // Content
           Expanded(child: _buildBody(tp)),
 
-          // Bottom panel
           _BottomPanel(tp: tp, onContinue: _onContinue),
         ]),
       );
@@ -197,9 +192,6 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
   }
 }
 
-// ══════════════════════════════════════════════
-// CARRIAGE VIEW – router tới layout phù hợp
-// ══════════════════════════════════════════════
 class _CarriageView extends StatelessWidget {
   final CarriageWithSeats carriage;
   final TripProvider tp;
@@ -210,10 +202,8 @@ class _CarriageView extends StatelessWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // Legend
         _Legend(),
         const SizedBox(height: 16),
-        // Carriage info
         Row(children: [
           const Icon(Icons.train, color: AppTheme.textHint, size: 14),
           const SizedBox(width: 6),
@@ -226,7 +216,6 @@ class _CarriageView extends StatelessWidget {
         ]),
         const SizedBox(height: 12),
 
-        // Layout theo loại toa
         if (carriage.carriageType == 'soft_seat' ||
             carriage.carriageType == 'hard_seat')
           _ChairLayout(carriage: carriage, tp: tp)
@@ -237,9 +226,6 @@ class _CarriageView extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════
-// CHAIR LAYOUT: Toa Ghế ngồi (Bắt buộc dùng GridView.builder)
-// ══════════════════════════════════════════════
 class _ChairLayout extends StatelessWidget {
   final CarriageWithSeats carriage;
   final TripProvider tp;
@@ -266,10 +252,6 @@ class _ChairLayout extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════
-// BERTH LAYOUT: Toa Giường nằm 
-// (Sử dụng chung cấu trúc GridView nhưng chia 2 cột cho giường nằm)
-// ══════════════════════════════════════════════
 class _BerthLayout extends StatelessWidget {
   final CarriageWithSeats carriage;
   final TripProvider tp;
@@ -297,9 +279,6 @@ class _BerthLayout extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════
-// SEAT WIDGET: Định nghĩa Widget ghế độc lập
-// ══════════════════════════════════════════════
 class _SeatWidget extends StatelessWidget {
   final SeatAvailability seat;
   final TripProvider tp;
@@ -314,7 +293,6 @@ class _SeatWidget extends StatelessWidget {
     Color bgColor;
     Color borderColor;
 
-    // Phân nhánh màu sắc theo trạng thái thực tế
     if (!isAvailable) {
       bgColor = AppTheme.seatBooked; // Đã đặt: Màu xám
       borderColor = AppTheme.seatBooked;
@@ -326,20 +304,16 @@ class _SeatWidget extends StatelessWidget {
       borderColor = AppTheme.seatAvailable; // Trống: Xanh lá viền mỏng
     }
 
-    // Bọc trong Center để Container bên trong giữ được cứng width: 45, height: 45
-    // thay vì bị GridView ép stretch lấp đầy ô.
     return Center(
       child: GestureDetector(
         onTap: () {
           if (!isAvailable) return; // Không cho click nếu đã đặt
           
-          // Lấy carriage hiện tại chứa ghế này để truyền vào tapSeat
           final carriage = tp.carriages.firstWhere(
             (c) => c.seats.any((s) => s.id == seat.id),
             orElse: () => tp.carriages.first,
           );
           
-          // Gọi hàm tapSeat đã định nghĩa sẵn trong TripProvider
           tp.tapSeat(seat, carriage);
         },
         child: Container(
@@ -369,9 +343,6 @@ class _SeatWidget extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════
-// LEGEND
-// ══════════════════════════════════════════════
 class _Legend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -404,9 +375,6 @@ class _LegendItem extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════
-// BOTTOM PANEL
-// ══════════════════════════════════════════════
 class _BottomPanel extends StatelessWidget {
   final TripProvider tp;
   final Future<void> Function() onContinue;
@@ -434,7 +402,6 @@ class _BottomPanel extends StatelessWidget {
           )
         else ...[
           Row(children: [
-            // Seat info
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Ghế ${tp.selectedSeat?.seatNumber ?? ""}',
@@ -449,12 +416,10 @@ class _BottomPanel extends StatelessWidget {
               ]),
             ),
             const SizedBox(width: 8),
-            // Price
             Text(price.format(tp.selectedSeat?.price ?? 0),
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800,
                     color: AppTheme.primary)),
           ]),
-          // Countdown nếu đang lock
           if (tp.isSeatLocked) ...[
             const SizedBox(height: 8),
             Container(
@@ -474,7 +439,6 @@ class _BottomPanel extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 10),
-          // Button
           SizedBox(
             width: double.infinity,
             height: 52,

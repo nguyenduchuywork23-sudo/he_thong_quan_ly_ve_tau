@@ -12,13 +12,8 @@ namespace VetauBackend.Data
         {
             context.Database.EnsureCreated();
 
-            // 1. Seed Admin
             if (!context.Users.Any(u => u.Role == "admin"))
             {
-                // Mật khẩu hash tạm (bạn có thể thay bằng BCrypt.Net sau)
-                // Vì không có thư viện Bcrypt mặc định, tạm dùng MD5 hoặc chuỗi giả.
-                // Ở đây tôi giả định sẽ dùng BCrypt.Net-Next (cần cài thêm) hoặc viết hàm hash. 
-                // Tạm thời để plain hoặc chuỗi đơn giản.
                 context.Users.Add(new User
                 {
                     Email = "admin@vetau.vn",
@@ -30,7 +25,6 @@ namespace VetauBackend.Data
                 context.SaveChanges();
             }
 
-            // Seed Staff account
             if (!context.Users.Any(u => u.Role == "staff"))
             {
                 context.Users.Add(new User
@@ -44,7 +38,6 @@ namespace VetauBackend.Data
                 context.SaveChanges();
             }
 
-            // 2. Price Multipliers
             if (!context.PriceMultipliers.Any())
             {
                 context.PriceMultipliers.AddRange(
@@ -57,7 +50,6 @@ namespace VetauBackend.Data
                 context.SaveChanges();
             }
 
-            // 3. Stations
             if (!context.Stations.Any())
             {
                 var stations = new List<Station>
@@ -77,14 +69,11 @@ namespace VetauBackend.Data
                 context.SaveChanges();
             }
 
-            // 4. Routes
             if (!context.Routes.Any())
             {
-                // Chiều đi: HN-SG
                 var hnSg = new VetauBackend.Models.Route { Name = "Hà Nội - Sài Gòn", Code = "HN-SG", Description = "Tuyến Thống Nhất Bắc Nam (Chiều đi)" };
                 context.Routes.Add(hnSg);
                 
-                // Chiều về: SG-HN
                 var sgHn = new VetauBackend.Models.Route { Name = "Sài Gòn - Hà Nội", Code = "SG-HN", Description = "Tuyến Thống Nhất Bắc Nam (Chiều về)" };
                 context.Routes.Add(sgHn);
                 
@@ -92,7 +81,6 @@ namespace VetauBackend.Data
 
                 var stations = context.Stations.OrderBy(s => s.SortOrder).ToList();
                 
-                // Trạm cho chiều HN-SG
                 int order = 1;
                 foreach (var st in stations)
                 {
@@ -105,7 +93,6 @@ namespace VetauBackend.Data
                     });
                 }
 
-                // Trạm cho chiều SG-HN (đảo ngược lại)
                 var reverseStations = stations.AsEnumerable().Reverse().ToList();
                 int revOrder = 1;
                 foreach (var st in reverseStations)
@@ -122,19 +109,15 @@ namespace VetauBackend.Data
                 context.SaveChanges();
             }
 
-            // 5. Trains & Carriages & Seats
             if (!context.Trains.Any())
             {
-                // --- TÀU SE1 ---
                 var se1 = new Train { Name = "SE1", Code = "SE1", TrainType = "express", TotalCarriages = 5 };
                 context.Trains.Add(se1);
                 
-                // --- TÀU SE2 ---
                 var se2 = new Train { Name = "SE2", Code = "SE2", TrainType = "express", TotalCarriages = 5 };
                 context.Trains.Add(se2);
                 context.SaveChanges();
 
-                // Tạo toa cho cả 2 tàu
                 var trains = new[] { se1, se2 };
                 var carriageTypes = new[] { "soft_seat", "soft_seat", "hard_berth_6", "soft_berth_4", "vip" };
                 
@@ -153,7 +136,6 @@ namespace VetauBackend.Data
                         context.Carriages.Add(c);
                         context.SaveChanges();
 
-                        // Tạo ghế cho toa này
                         var seats = new List<Seat>();
                         for (int s = 1; s <= c.TotalSeats; s++)
                         {
@@ -170,7 +152,6 @@ namespace VetauBackend.Data
                 context.SaveChanges();
             }
 
-            // 6. Trips
             if (!context.Trips.Any())
             {
                 var trainSE1 = context.Trains.FirstOrDefault(t => t.Code == "SE1");
@@ -180,7 +161,6 @@ namespace VetauBackend.Data
                 
                 if (trainSE1 != null && routeHnSg != null)
                 {
-                    // Chuyến SE1 (HN-SG)
                     for (int i = 0; i <= 10; i++)
                     {
                         var tripDate = DateTime.UtcNow.Date.AddDays(i);
@@ -197,7 +177,6 @@ namespace VetauBackend.Data
                         });
                     }
 
-                    // Chuyến SE2 (SG-HN)
                     if (trainSE2 != null && routeSgHn != null)
                     {
                         for (int i = 0; i <= 10; i++)
@@ -220,7 +199,6 @@ namespace VetauBackend.Data
                 }
             }
 
-            // 7. Bookings (Đơn vé mẫu)
             if (!context.Bookings.Any())
             {
                 var todayTrip = context.Trips.FirstOrDefault(t => t.DepartureDate.Date == DateTime.UtcNow.Date);

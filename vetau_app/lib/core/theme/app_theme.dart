@@ -1,4 +1,3 @@
-/// App Theme – Design System chuẩn Mobile (Soft Blue / Ocean Theme)
 library;
 
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   AppTheme._();
 
-  // ─── Màu sắc (Soft Blue Palette) ────────────────
   static const Color primary = Color(0xFF2196F3);       // Blue 500
   static const Color primaryLight = Color(0xFF64B5F6);  // Blue 300
   static const Color primaryDark = Color(0xFF1976D2);   // Blue 700
@@ -31,7 +29,6 @@ class AppTheme {
   static const Color seatBooked = Color(0xFFCBD5E1);
   static const Color seatLocked = Color(0xFF94A3B8);
 
-  // ─── Gradient ─────────────────────────────────
   static const LinearGradient heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -50,20 +47,17 @@ class AppTheme {
     colors: [Color(0xFFFFFFFF), Color(0xFFF8FAFC)],
   );
 
-  // ─── Border Radius ────────────────────────────
   static const double radiusCard = 20.0;
   static const double radiusButton = 16.0;
   static const double radiusInput = 16.0;
   static const double radiusSmall = 10.0;
 
-  // ─── Spacing ──────────────────────────────────
   static const double spacingXS = 4.0;
   static const double spacingS = 8.0;
   static const double spacingM = 16.0;
   static const double spacingL = 24.0;
   static const double spacingXL = 32.0;
 
-  // ─── Shadow (Soft Drop Shadow) ────────────────
   static List<BoxShadow> get softShadow => [
         BoxShadow(
           color: const Color(0xFF1A237E).withOpacity(0.06),
@@ -72,7 +66,6 @@ class AppTheme {
         ),
       ];
 
-  // ─── ThemeData ────────────────────────────────
   static ThemeData get lightTheme {
     final base = ThemeData.light(useMaterial3: true);
 
@@ -117,7 +110,6 @@ class AppTheme {
           fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white,
         ),
       ),
-      // ── AppBar ──
       appBarTheme: AppBarTheme(
         backgroundColor: surface,
         elevation: 0,
@@ -129,7 +121,6 @@ class AppTheme {
         ),
         iconTheme: const IconThemeData(color: textPrimary),
       ),
-      // ── Card ──
       cardTheme: CardThemeData(
         color: cardColor,
         elevation: 0,
@@ -139,7 +130,6 @@ class AppTheme {
         ),
         margin: const EdgeInsets.symmetric(horizontal: spacingM, vertical: spacingS),
       ),
-      // ── ElevatedButton ──
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
@@ -155,7 +145,6 @@ class AppTheme {
           ),
         ),
       ),
-      // ── OutlinedButton ──
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: primary,
@@ -170,7 +159,6 @@ class AppTheme {
           ),
         ),
       ),
-      // ── Input ──
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surface,
@@ -196,7 +184,6 @@ class AppTheme {
         hintStyle: GoogleFonts.nunitoSans(color: textHint, fontSize: 14),
         labelStyle: GoogleFonts.nunitoSans(color: textSecondary, fontSize: 14),
       ),
-      // ── BottomSheet ──
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: surface,
         elevation: 10,
@@ -204,14 +191,12 @@ class AppTheme {
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
       ),
-      // ── Chip ──
       chipTheme: ChipThemeData(
         backgroundColor: background,
         labelStyle: GoogleFonts.nunitoSans(fontSize: 12, color: textSecondary),
         side: const BorderSide(color: cardBorder),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
-      // ── Divider ──
       dividerTheme: const DividerThemeData(
         color: cardBorder,
         thickness: 1,

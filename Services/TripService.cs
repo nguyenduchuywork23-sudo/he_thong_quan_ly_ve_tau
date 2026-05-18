@@ -34,14 +34,12 @@ namespace VetauBackend.Services
             if (!DateTime.TryParse(req.Date, out var date))
                 return null;
 
-            // Truy vấn các chuyến trong ngày có ga đi, ga đến
             var trips = await _context.Trips
                 .Include(t => t.Train)
                 .Include(t => t.Route)
                 .Where(t => t.DepartureDate.Date == date.Date && t.Status == "scheduled")
                 .ToListAsync();
 
-            // Lọc ra các chuyến mà ga đi có stop_order < ga đến
             var result = new List<object>();
             foreach (var t in trips)
             {
@@ -84,13 +82,11 @@ namespace VetauBackend.Services
                 .Where(c => c.TrainId == trip.TrainId)
                 .ToListAsync();
 
-            // Seats đã đặt (confirmed/pending)
             var bookedSeats = await _context.Bookings
                 .Where(b => b.TripId == tripId && (b.Status == "pending" || b.Status == "confirmed"))
                 .Select(b => b.SeatId)
                 .ToListAsync();
 
-            // Seats đang lock
             var lockedSeats = await _context.SeatLocks
                 .Where(sl => sl.TripId == tripId && !sl.IsReleased && sl.LockedUntil > DateTime.UtcNow)
                 .Select(sl => sl.SeatId)
@@ -127,7 +123,6 @@ namespace VetauBackend.Services
 
         public async Task<bool> LockSeatAsync(LockSeatRequest req, string sessionId, int? userId)
         {
-            // Kiểm tra ghế đã lock hoặc đã book chưa
             var isBooked = await _context.Bookings.AnyAsync(b => b.TripId == req.TripId && b.SeatId == req.SeatId && (b.Status == "pending" || b.Status == "confirmed"));
             var isLocked = await _context.SeatLocks.AnyAsync(sl => sl.TripId == req.TripId && sl.SeatId == req.SeatId && !sl.IsReleased && sl.LockedUntil > DateTime.UtcNow);
 
@@ -150,9 +145,6 @@ namespace VetauBackend.Services
             return true;
         }
 
-        /// <summary>
-        /// Trả danh sách ga active — dùng cho StationPicker (public, không cần auth)
-        /// </summary>
         public async Task<List<VetauBackend.Models.Station>> GetStationsAsync()
         {
             return await _context.Stations

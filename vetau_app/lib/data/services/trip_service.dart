@@ -1,9 +1,3 @@
-/// Trip Service – Gọi API thật tới .NET Core Backend
-///
-/// Endpoints được xử lý:
-///   GET  /api/trips/search          → [searchTrips]
-///   GET  /api/trips/{id}/seats      → [getAvailableSeats]
-///   POST /api/trips/lock-seat       → [lockSeat]
 library;
 
 import 'package:dio/dio.dart';
@@ -16,16 +10,6 @@ import '../models/booking_model.dart';
 class TripService {
   final Dio _dio = DioClient.instance.dio;
 
-  // ─────────────────────────────────────────────────────────────────
-  // GET /api/trips/search?FromStation=&ToStation=&Date=
-  //
-  // BE nhận [SearchTripRequest] dưới dạng query params:
-  //   FromStation: mã ga đi (vd: "HAN")
-  //   ToStation:   mã ga đến (vd: "SGN")
-  //   Date:        ngày dạng "yyyy-MM-dd"
-  //
-  // Trả về List<TripSearchResult>
-  // ─────────────────────────────────────────────────────────────────
   Future<List<TripSearchResult>> searchTrips({
     required String fromStationCode,
     required String toStationCode,
@@ -37,7 +21,6 @@ class TripService {
         queryParameters: {
           'FromStation': fromStationCode,
           'ToStation': toStationCode,
-          // BE dùng DateTime.TryParse → gửi "yyyy-MM-dd"
           'Date': '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
         },
       );
@@ -57,11 +40,6 @@ class TripService {
     }
   }
 
-  // ─────────────────────────────────────────────────────────────────
-  // GET /api/trips/{id}/seats
-  //
-  // Trả về List<CarriageWithSeats> – từng toa kèm trạng thái ghế
-  // ─────────────────────────────────────────────────────────────────
   Future<List<CarriageWithSeats>> getAvailableSeats(int tripId) async {
     try {
       final response = await _dio.get(ApiConstants.tripSeats(tripId));
@@ -81,13 +59,6 @@ class TripService {
     }
   }
 
-  // ─────────────────────────────────────────────────────────────────
-  // POST /api/trips/lock-seat
-  // Header: X-Session-Id (SessionInterceptor tự đính kèm)
-  //
-  // Trả về [LockSeatResponse] nếu thành công
-  // Ném [AppException] nếu ghế đã bị đặt/lock (BE trả 400)
-  // ─────────────────────────────────────────────────────────────────
   Future<LockSeatResponse> lockSeat({
     required int seatId,
     required int tripId,
@@ -102,7 +73,6 @@ class TripService {
     } on DioException catch (e) {
       final appEx = e.error;
       if (appEx is AppException) throw appEx;
-      // BE trả 400: "Ghế đã bị đặt hoặc đang được giữ bởi người khác."
       throw AppException(
         message: e.message ?? 'Không thể giữ ghế. Vui lòng chọn ghế khác.',
         statusCode: e.response?.statusCode,
@@ -112,10 +82,6 @@ class TripService {
     }
   }
 
-  // ─────────────────────────────────────────────────────────────────
-  // GET /api/Trips/stations  (Public – dùng cho StationPicker)
-  // Không yêu cầu đăng nhập; trả về List<StationModel>
-  // ─────────────────────────────────────────────────────────────────
   Future<List<StationModel>> getStations() async {
     try {
       final response = await _dio.get(ApiConstants.tripsStations);

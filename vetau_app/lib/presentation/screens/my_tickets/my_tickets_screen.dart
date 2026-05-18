@@ -1,4 +1,3 @@
-/// MyTicketsScreen – Lịch sử vé đã đặt (đọc từ SharedPreferences)
 library;
 
 import 'package:flutter/material.dart';
@@ -91,9 +90,6 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
   }
 }
 
-// ══════════════════════════════════════════════
-// TICKET CARD
-// ══════════════════════════════════════════════
 class _TicketCard extends StatelessWidget {
   final Map<String, dynamic> booking;
   final VoidCallback onTap;
@@ -134,7 +130,6 @@ class _TicketCard extends StatelessWidget {
           boxShadow: AppTheme.softShadow,
         ),
         child: Column(children: [
-          // ── Header: mã đặt chỗ ──────────────
           Container(
             padding: const EdgeInsets.symmetric(
                 horizontal: 16, vertical: 12),
@@ -169,11 +164,9 @@ class _TicketCard extends StatelessWidget {
             ]),
           ),
 
-          // ── Body: route & seat info ──────────
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(children: [
-              // Tuyến đường
               Row(children: [
                 const Icon(Icons.train, color: AppTheme.primary, size: 16),
                 const SizedBox(width: 8),
@@ -229,7 +222,6 @@ class _TicketCard extends StatelessWidget {
             ]),
           ),
 
-          // ── Footer: tap to view QR ───────────
           Container(
             padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
@@ -272,9 +264,6 @@ class _InfoItem extends StatelessWidget {
   );
 }
 
-// ══════════════════════════════════════════════
-// QR BOTTOM SHEET
-// ══════════════════════════════════════════════
 class _QrBottomSheet extends StatelessWidget {
   final String bookingCode;
   final String? qrCodeData;
@@ -286,8 +275,6 @@ class _QrBottomSheet extends StatelessWidget {
     required this.booking,
   });
 
-  /// Luôn dùng bookingCode làm dữ liệu QR — tránh lỗi QrInputTooLongException
-  /// khi BE trả về chuỗi SVG/Base64 quá dài trong qrCodeData.
   Widget _buildQr() {
     return QrImageView(
       data: 'VETAU|$bookingCode',
@@ -326,13 +313,11 @@ class _QrBottomSheet extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(20, 12, 20,
           20 + MediaQuery.of(context).padding.bottom),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        // Handle
         Container(width: 40, height: 4,
           decoration: BoxDecoration(color: AppTheme.cardBorder,
               borderRadius: BorderRadius.circular(2))),
         const SizedBox(height: 20),
 
-        // Code
         const Text('MÃ ĐẶT CHỖ', style: TextStyle(
             fontSize: 11, fontWeight: FontWeight.w700,
             color: AppTheme.textHint, letterSpacing: 2)),
@@ -346,7 +331,6 @@ class _QrBottomSheet extends StatelessWidget {
             textAlign: TextAlign.center),
         const SizedBox(height: 20),
 
-        // QR
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -372,9 +356,6 @@ class _QrBottomSheet extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════
-// EMPTY STATE
-// ══════════════════════════════════════════════
 class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

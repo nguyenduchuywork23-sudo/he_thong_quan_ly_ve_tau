@@ -1,5 +1,3 @@
-/// StaffPassengerStatsScreen – Thống kê hành khách
-/// GET /api/Staff/passenger-stats (StaffProvider)
 library;
 
 import 'package:flutter/material.dart';
@@ -55,7 +53,6 @@ class _StaffPassengerStatsScreenState
             style: TextStyle(color: AppTheme.textSecondary)));
       }
 
-      // Tỷ lệ trên tàu
       final onboardRatio = stats.totalPassengers > 0
           ? stats.onBoardCount / stats.totalPassengers
           : 0.0;
@@ -67,7 +64,6 @@ class _StaffPassengerStatsScreenState
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // ── Total card ────────────────────────
             _BigStatCard(
               label: 'Tổng hành khách hôm nay',
               value: stats.totalPassengers.toString(),
@@ -76,7 +72,6 @@ class _StaffPassengerStatsScreenState
             ),
             const SizedBox(height: 12),
 
-            // ── On board & Waiting ─────────────────
             Row(children: [
               Expanded(child: _BigStatCard(
                 label: 'Đang trên tàu',
@@ -94,7 +89,6 @@ class _StaffPassengerStatsScreenState
             ]),
             const SizedBox(height: 20),
 
-            // ── Progress bar ──────────────────────
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(

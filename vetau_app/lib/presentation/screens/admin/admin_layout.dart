@@ -1,7 +1,3 @@
-/// AdminLayout – Khung điều hướng Admin Panel
-///
-/// BottomNavigationBar: Dashboard | Vé | Ga tàu | Tàu
-/// AppBar tone tối (indigo) để phân biệt với Customer UI
 library;
 
 import 'package:flutter/material.dart';
@@ -47,7 +43,6 @@ class _AdminLayoutState extends State<AdminLayout> {
       AdminStationsScreen(),
       AdminTrainsScreen(),
     ];
-    // Preload dashboard & bookings
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final ap = context.read<AdminProvider>();
       ap.loadDashboard();
@@ -63,7 +58,6 @@ class _AdminLayoutState extends State<AdminLayout> {
     return Scaffold(
       backgroundColor: AppTheme.background,
 
-      // ── Admin AppBar (indigo tone) ────────────
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: Container(
@@ -75,7 +69,6 @@ class _AdminLayoutState extends State<AdminLayout> {
               padding: const EdgeInsets.symmetric(
                   horizontal: 16, vertical: 8),
               child: Row(children: [
-                // Admin badge
                 Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8, vertical: 3),
@@ -95,7 +88,6 @@ class _AdminLayoutState extends State<AdminLayout> {
                         color: AppTheme.textPrimary)),
                 const Spacer(),
 
-                // User info + logout
                 if (user != null) ...[
                   Column(crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +103,6 @@ class _AdminLayoutState extends State<AdminLayout> {
                   const SizedBox(width: 10),
                 ],
 
-                // Refresh + Logout buttons
                 IconButton(
                   icon: const Icon(Icons.refresh,
                       color: AppTheme.textSecondary, size: 20),
@@ -158,13 +149,11 @@ class _AdminLayoutState extends State<AdminLayout> {
         ),
       ),
 
-      // ── Content ──────────────────────────────
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
       ),
 
-      // ── Bottom Navigation ─────────────────────
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppTheme.surface,

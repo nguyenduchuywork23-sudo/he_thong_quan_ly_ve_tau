@@ -1,4 +1,3 @@
-/// HomeScreen – Màn hình tìm kiếm chuyến tàu (Mobile-first)
 library;
 
 import 'package:flutter/material.dart';
@@ -113,7 +112,6 @@ class _HomeScreenState extends State<HomeScreen>
       body: Stack(
         children: [
           Container(decoration: const BoxDecoration(gradient: AppTheme.heroGradient)),
-          // Decorative blobs
           Positioned(top: -80, right: -60,
             child: Container(width: 220, height: 220,
               decoration: BoxDecoration(shape: BoxShape.circle,
@@ -163,7 +161,6 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       padding: const EdgeInsets.all(AppTheme.spacingM),
       child: Column(children: [
-        // Trip type toggle
         Container(
           height: 42,
           decoration: BoxDecoration(color: AppTheme.background, borderRadius: BorderRadius.circular(8)),
@@ -176,7 +173,6 @@ class _HomeScreenState extends State<HomeScreen>
         ),
         const SizedBox(height: AppTheme.spacingM),
 
-        // From station
         _StationTile(
           label: 'Ga đi', station: _fromStation,
           icon: Icons.radio_button_checked, iconColor: AppTheme.primary,
@@ -184,7 +180,6 @@ class _HomeScreenState extends State<HomeScreen>
               selected: _fromStation, onSelected: (s) => setState(() => _fromStation = s)),
         ),
 
-        // Swap
         Row(children: [
           Expanded(child: Container(height: 1, color: AppTheme.cardBorder)),
           GestureDetector(
@@ -206,7 +201,6 @@ class _HomeScreenState extends State<HomeScreen>
           Expanded(child: Container(height: 1, color: AppTheme.cardBorder)),
         ]),
 
-        // To station
         _StationTile(
           label: 'Ga đến', station: _toStation,
           icon: Icons.location_on, iconColor: AppTheme.warning,
@@ -216,7 +210,6 @@ class _HomeScreenState extends State<HomeScreen>
 
         const Divider(height: 16),
 
-        // Date
         InkWell(
           onTap: _pickDate,
           borderRadius: BorderRadius.circular(AppTheme.radiusInput),
@@ -268,15 +261,11 @@ class _HomeScreenState extends State<HomeScreen>
   }
 }
 
-// ═══════════════════════════════════════════════
-// Private sub-widgets
-// ═══════════════════════════════════════════════
 
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(children: [
-      // Logo
       Container(width: 36, height: 36,
         decoration: BoxDecoration(color: AppTheme.primary,
             borderRadius: BorderRadius.circular(10)),
@@ -290,9 +279,7 @@ class _Header extends StatelessWidget {
       ])),
       const Spacer(),
 
-      // Auth section
       Consumer<AuthProvider>(builder: (ctx, auth, _) {
-        // ── Chưa đăng nhập ──
         if (!auth.isAuthenticated) {
           return TextButton.icon(
             onPressed: () => context.push('/login'),
@@ -308,7 +295,6 @@ class _Header extends StatelessWidget {
           );
         }
 
-        // ── Đã đăng nhập: Avatar + Dropdown ──
         final initial = auth.user?.fullName.isNotEmpty == true
             ? auth.user!.fullName[0].toUpperCase()
             : 'U';
@@ -332,7 +318,6 @@ class _Header extends StatelessWidget {
             }
           },
           itemBuilder: (_) => [
-            // User info header
             PopupMenuItem<String>(
               enabled: false,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,7 +345,6 @@ class _Header extends StatelessWidget {
                 const Divider(height: 16),
               ]),
             ),
-            // Vé của tôi
             const PopupMenuItem<String>(
               value: 'tickets',
               child: Row(children: [
@@ -372,7 +356,6 @@ class _Header extends StatelessWidget {
                         fontSize: 14)),
               ]),
             ),
-            // Admin (chỉ hiện nếu là admin/staff)
             if (auth.isStaff)
               const PopupMenuItem<String>(
                 value: 'admin',
@@ -385,7 +368,6 @@ class _Header extends StatelessWidget {
                           fontSize: 14)),
                 ]),
               ),
-            // Đăng xuất
             const PopupMenuItem<String>(
               value: 'logout',
               child: Row(children: [

@@ -1,4 +1,3 @@
-/// RegisterScreen – Đăng ký tài khoản mới
 library;
 
 import 'package:flutter/material.dart';
@@ -90,7 +89,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         margin: const EdgeInsets.all(12),
       ));
       
-      // Navigate to home after successful registration
       context.canPop() ? context.pop() : context.go('/');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -139,7 +137,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               constraints: const BoxConstraints(),
                             ),
                             const Spacer(),
-                            // Logo
                             Container(width: 40, height: 40,
                               decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(10)),
@@ -155,7 +152,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
                         const SizedBox(height: 32),
 
-                        // Full Name
                         const _Label('Họ và tên'),
                         const SizedBox(height: 6),
                         TextFormField(
@@ -173,7 +169,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Email
                         const _Label('Email'),
                         const SizedBox(height: 6),
                         TextFormField(
@@ -193,7 +188,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Password
                         const _Label('Mật khẩu'),
                         const SizedBox(height: 6),
                         TextFormField(
@@ -219,7 +213,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Confirm Password
                         const _Label('Xác nhận mật khẩu'),
                         const SizedBox(height: 6),
                         TextFormField(
@@ -245,7 +238,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 32),
 
-                        // Submit button
                         ElevatedButton(
                           onPressed: auth.isLoading ? null : _submit,
                           style: ElevatedButton.styleFrom(

@@ -1,4 +1,3 @@
-/// BookingConfirmScreen – Xác nhận đặt vé thành công & QR thanh toán
 library;
 
 import 'dart:convert';
@@ -87,7 +86,6 @@ class _BookingConfirmScreenState extends State<BookingConfirmScreen>
 
         return Scaffold(
           backgroundColor: AppTheme.background,
-          // Không có back button – WillPopScope ngăn back
           appBar: AppBar(
             backgroundColor: AppTheme.surface,
             automaticallyImplyLeading: false,
@@ -107,7 +105,6 @@ class _BookingConfirmScreenState extends State<BookingConfirmScreen>
               child: Column(children: [
                 const SizedBox(height: 8),
 
-                // ── Success Animation ──────────────
                 ScaleTransition(
                   scale: _scaleAnim,
                   child: Container(
@@ -133,7 +130,6 @@ class _BookingConfirmScreenState extends State<BookingConfirmScreen>
                 ),
                 const SizedBox(height: 24),
 
-                // ── Booking Code Card ──────────────
                 FadeTransition(
                   opacity: _fadeAnim,
                   child: _BookingCodeCard(
@@ -143,7 +139,6 @@ class _BookingConfirmScreenState extends State<BookingConfirmScreen>
                 ),
                 const SizedBox(height: 16),
 
-                // ── QR Code Card ───────────────────
                 FadeTransition(
                   opacity: _fadeAnim,
                   child: _QrCard(
@@ -153,7 +148,6 @@ class _BookingConfirmScreenState extends State<BookingConfirmScreen>
                 ),
                 const SizedBox(height: 16),
 
-                // ── Trip Details Card ──────────────
                 if (trip != null)
                   FadeTransition(
                     opacity: _fadeAnim,
@@ -168,7 +162,6 @@ class _BookingConfirmScreenState extends State<BookingConfirmScreen>
                   ),
                 const SizedBox(height: 16),
 
-                // ── Payment deadline ───────────────
                 if (deadline != null)
                   FadeTransition(
                     opacity: _fadeAnim,
@@ -176,7 +169,6 @@ class _BookingConfirmScreenState extends State<BookingConfirmScreen>
                   ),
                 const SizedBox(height: 24),
 
-                // ── Action buttons ─────────────────
                 FadeTransition(
                   opacity: _fadeAnim,
                   child: Column(children: [
@@ -207,7 +199,6 @@ class _BookingConfirmScreenState extends State<BookingConfirmScreen>
   }
 }
 
-// ── Booking code card ─────────────────────────
 class _BookingCodeCard extends StatelessWidget {
   final String bookingCode;
   final VoidCallback onCopy;
@@ -251,7 +242,6 @@ class _BookingCodeCard extends StatelessWidget {
   }
 }
 
-// ── QR code card ─────────────────────────────
 class _QrCard extends StatelessWidget {
   final String? qrCodeData;
   final String bookingCode;
@@ -280,8 +270,6 @@ class _QrCard extends StatelessWidget {
     );
   }
 
-  /// Dữ liệu QR = chuỗi ngắn "VETAU|<bookingCode>" — luôn dùng bookingCode
-  /// để tránh lỗi QrInputTooLongException khi BE trả SVG/Base64 quá dài.
   String get _qrPayload => 'VETAU|$bookingCode';
 
   Widget _buildQr() {
@@ -316,7 +304,6 @@ class _QrCard extends StatelessWidget {
   }
 }
 
-// ── Trip detail card ──────────────────────────
 class _TripDetailCard extends StatelessWidget {
   final dynamic trip, seat, carriage;
   final double finalPrice;
@@ -383,7 +370,6 @@ class _Row extends StatelessWidget {
   );
 }
 
-// ── Payment deadline card ─────────────────────
 class _DeadlineCard extends StatelessWidget {
   final DateTime deadline;
   const _DeadlineCard({required this.deadline});

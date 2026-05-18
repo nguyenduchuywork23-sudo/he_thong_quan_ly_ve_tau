@@ -1,7 +1,3 @@
-/// Booking Service – Gọi API thật tới .NET Core Backend
-///
-/// Endpoints được xử lý:
-///   POST /api/bookings   → [createBooking]
 library;
 
 import 'package:dio/dio.dart';
@@ -12,15 +8,6 @@ import '../models/booking_model.dart';
 class BookingService {
   final Dio _dio = DioClient.instance.dio;
 
-  // ─────────────────────────────────────────────────────────────────
-  // POST /api/bookings
-  // Header: X-Session-Id (SessionInterceptor tự đính kèm)
-  //         Authorization: Bearer <token> (AuthInterceptor – nếu đã login)
-  //
-  // BE kiểm tra X-Session-Id có tồn tại và match SeatLock.
-  // Nếu thiếu → 400: "Thiếu SessionId giữ chỗ."
-  // Nếu thành công → [CreateBookingResponse] chứa bookingCode và qrCodeData
-  // ─────────────────────────────────────────────────────────────────
   Future<CreateBookingResponse> createBooking(
     CreateBookingRequest request,
     String sessionId,
@@ -40,7 +27,6 @@ class BookingService {
       final appEx = e.error;
       if (appEx is AppException) throw appEx;
 
-      // Xử lý các lỗi 400 cụ thể từ BookingsController.cs
       final statusCode = e.response?.statusCode;
       final body = e.response?.data;
       String message = 'Đặt vé thất bại. Vui lòng thử lại.';
@@ -58,11 +44,6 @@ class BookingService {
     }
   }
 
-  // ─────────────────────────────────────────────────────────────────
-  // GET /api/bookings/my-bookings
-  // Lấy danh sách lịch sử vé của người dùng đã đăng nhập.
-  // Trả về List<Booking> (chuyển thành Map để xử lý)
-  // ─────────────────────────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> getMyBookings() async {
     try {
       final response = await _dio.get(ApiConstants.myBookings);

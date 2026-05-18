@@ -1,8 +1,3 @@
-/// StationPickerSheet – Bottom Sheet chọn ga tàu
-///
-/// Load danh sách từ TripProvider.stations (đã gọi API).
-/// Nếu stations chưa load → hiển thị text field nhập mã ga thủ công.
-/// Hỗ trợ tìm kiếm (search) trong danh sách.
 library;
 
 import 'package:flutter/material.dart';
@@ -23,7 +18,6 @@ class StationPickerSheet extends StatefulWidget {
     this.selected,
   });
 
-  /// Helper để mở bottom sheet
   static Future<void> show({
     required BuildContext context,
     required String title,
@@ -112,7 +106,6 @@ class _StationPickerSheetState extends State<StationPickerSheet> {
           ),
           child: Column(
             children: [
-              // ── Handle ─────────────────────────────
               const SizedBox(height: 12),
               Container(
                 width: 40, height: 4,
@@ -123,7 +116,6 @@ class _StationPickerSheetState extends State<StationPickerSheet> {
               ),
               const SizedBox(height: 16),
 
-              // ── Title ──────────────────────────────
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM),
                 child: Row(
@@ -139,7 +131,6 @@ class _StationPickerSheetState extends State<StationPickerSheet> {
                 ),
               ),
 
-              // ── Search Field ───────────────────────
               Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: AppTheme.spacingM, vertical: AppTheme.spacingS),
@@ -162,7 +153,6 @@ class _StationPickerSheetState extends State<StationPickerSheet> {
 
               const Divider(height: 1),
 
-              // ── Content ────────────────────────────
               Expanded(
                 child: _buildContent(scrollCtrl),
               ),
@@ -176,19 +166,16 @@ class _StationPickerSheetState extends State<StationPickerSheet> {
   Widget _buildContent(ScrollController scrollCtrl) {
     return Consumer<TripProvider>(
       builder: (ctx, tp, _) {
-        // Loading state
         if (tp.stationsState == TripLoadState.loading) {
           return const Center(
             child: CircularProgressIndicator(color: AppTheme.primary),
           );
         }
 
-        // Error / fallback to manual input
         if (tp.stationsState == TripLoadState.error || _showManualInput) {
           return _ManualStationInput(onSubmit: widget.onSelected);
         }
 
-        // Empty search result
         if (_filtered.isEmpty) {
           return Center(
             child: Column(
@@ -203,7 +190,6 @@ class _StationPickerSheetState extends State<StationPickerSheet> {
           );
         }
 
-        // Station list
         return ListView.separated(
           controller: scrollCtrl,
           padding: const EdgeInsets.only(bottom: 32),
@@ -258,7 +244,6 @@ class _StationPickerSheetState extends State<StationPickerSheet> {
   }
 }
 
-// ── Fallback: nhập tay khi API stations không truy cập được ──
 
 class _ManualStationInput extends StatefulWidget {
   final void Function(StationModel) onSubmit;

@@ -1,4 +1,3 @@
-/// Auth Service – Gọi API đăng nhập .NET Core
 library;
 
 import 'package:dio/dio.dart';
@@ -8,8 +7,6 @@ import '../../core/constants/api_constants.dart';
 class AuthService {
   final Dio _dio = DioClient.instance.dio;
 
-  /// POST /api/auth/login
-  /// Trả về Map { "Token": "...", "User": { ... } }
   Future<Map<String, dynamic>> login({
     required String email,
     required String password,
@@ -32,8 +29,6 @@ class AuthService {
       throw AppException(message: 'Lỗi không xác định khi đăng nhập.');
     }
   }
-  /// POST /api/auth/register
-  /// Trả về Map { "Token": "...", "User": { ... } }
   Future<Map<String, dynamic>> register({
     required String email,
     required String password,

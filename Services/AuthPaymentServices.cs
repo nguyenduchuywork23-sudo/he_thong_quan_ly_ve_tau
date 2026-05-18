@@ -97,16 +97,11 @@ namespace VetauBackend.Services
     {
         public string GenerateVietQr(string bankId, string accountNo, double amount, string info)
         {
-            // Định dạng VietQR chuỗi tĩnh cơ bản:
-            // (Thực tế VietQR có chuẩn TLV phức tạp, để rút gọn dùng chuỗi QR dạng đơn giản hoặc text hiển thị)
-            // Chuỗi ví dụ mẫu (không hoàn toàn chuẩn VietQR xịn nhưng frontend có thể parse)
             string payload = $"VIETQR|{bankId}|{accountNo}|{amount}|{info}";
             
             var qr = QrCode.EncodeText(payload, QrCode.Ecc.Medium);
             var svg = qr.ToSvgString(4);
             return svg; // Trả về dạng SVG chuỗi để FE render hoặc parse. 
-            // Nếu dùng dạng Base64 PNG cần dùng thư viện khác hoặc viết helper cho Net.Codecrete
-            // Để đơn giản, ta trả về data uri dạng svg: "data:image/svg+xml;utf8," + ...
         }
     }
 }

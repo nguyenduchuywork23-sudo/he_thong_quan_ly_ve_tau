@@ -1,4 +1,3 @@
-/// LoginScreen – Đăng nhập & phân quyền
 library;
 
 import 'package:flutter/material.dart';
@@ -108,7 +107,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               constraints: const BoxConstraints(),
                             ),
                             const Spacer(),
-                            // Logo
                             Container(width: 40, height: 40,
                               decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(10)),
@@ -131,7 +129,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
                         const SizedBox(height: 32),
 
-                        // Email
                         const _Label('Email'),
                         const SizedBox(height: 6),
                         TextFormField(
@@ -151,7 +148,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Password
                         const _Label('Mật khẩu'),
                         const SizedBox(height: 6),
                         TextFormField(
@@ -178,7 +174,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 32),
 
-                        // Submit button
                         ElevatedButton(
                           onPressed: auth.isLoading ? null : _submit,
                           style: ElevatedButton.styleFrom(
@@ -215,7 +210,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Demo accounts info
                         Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(

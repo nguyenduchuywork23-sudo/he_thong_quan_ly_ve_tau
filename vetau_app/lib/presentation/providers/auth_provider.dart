@@ -1,4 +1,3 @@
-/// AuthProvider – Quản lý trạng thái đăng nhập
 library;
 
 import 'dart:convert';
@@ -8,9 +7,6 @@ import '../../data/services/auth_service.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/constants/api_constants.dart';
 
-// ─── Simple UserModel ─────────────────────────
-/// Ánh xạ từ class User trong Entities.cs
-/// (chỉ các field cần thiết cho Client)
 class UserModel {
   final int id;
   final String email;
@@ -56,9 +52,6 @@ class UserModel {
   bool get isStaff => role == 'staff' || role == 'admin';
 }
 
-// ═══════════════════════════════════════════════
-// AUTH PROVIDER
-// ═══════════════════════════════════════════════
 
 enum AuthState { initial, loading, authenticated, unauthenticated, error }
 
@@ -77,7 +70,6 @@ class AuthProvider extends ChangeNotifier {
   bool get isAdmin => _user?.isAdmin ?? false;
   bool get isStaff => _user?.isStaff ?? false;
 
-  // ─── Khởi tạo: kiểm tra token đã lưu ─────────
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(ApiConstants.keyJwtToken);
@@ -96,7 +88,6 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ─── Đăng nhập ────────────────────────────────
   Future<bool> login(String email, String password) async {
     _state = AuthState.loading;
     _error = null;
@@ -105,7 +96,6 @@ class AuthProvider extends ChangeNotifier {
     try {
       final data = await _authService.login(email: email, password: password);
 
-      // BE trả về { "Token": "...", "User": { ... } }
       final token = data['Token'] as String? ?? data['token'] as String? ?? '';
       final userMap = data['User'] as Map<String, dynamic>? ??
           data['user'] as Map<String, dynamic>? ??
@@ -113,7 +103,6 @@ class AuthProvider extends ChangeNotifier {
 
       _user = UserModel.fromJson(userMap);
 
-      // Lưu vào SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(ApiConstants.keyJwtToken, token);
       await prefs.setString(ApiConstants.keyUserJson, jsonEncode(_user!.toJson()));
@@ -135,7 +124,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // ─── Đăng ký ────────────────────────────────
   Future<bool> register(String email, String password, String fullName) async {
     _state = AuthState.loading;
     _error = null;
@@ -176,7 +164,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // ─── Đăng xuất ────────────────────────────────
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(ApiConstants.keyJwtToken);
